@@ -3,7 +3,7 @@
     <item
         android:id="@+id/mainmap1"
         android:title="Map"
-        android:icon="@drawable/icon_cluster"/>
+        android:icon="@drawable/icon_cluster" />
     <item
         android:id="@+id/mainmap2"
         android:title="Explore"
