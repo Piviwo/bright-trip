@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,14 +33,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
-        if (item.getItemId() == R.id.mainmap1)
+        if (item.getItemId() == R.id.mainmap)
                 fragment = new MainMap();
 
-        if (item.getItemId() ==  R.id.mainmap2)
+        if (item.getItemId() ==  R.id.explore)
                 fragment = new MainMap();
 
-        if (item.getItemId() ==  R.id.mainmap3)
-                fragment = new MainMap();
+        if (item.getItemId() ==  R.id.support)
+                fragment = new SupportFragment();
+
+        if (item.getItemId() ==  R.id.settings)
+                fragment = new SettingsFragment();
 
         if (fragment != null)
             getSupportFragmentManager().beginTransaction().replace(R.id.rel_layout, fragment).commit();

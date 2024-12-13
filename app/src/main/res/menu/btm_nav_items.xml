@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/mainmap1"
+        android:id="@+id/mainmap"
         android:title="Map"
-        android:icon="@drawable/icon_cluster" />
+        android:icon="@drawable/home_active" />
     <item
-        android:id="@+id/mainmap2"
+        android:id="@+id/explore"
         android:title="Explore"
         android:icon="@drawable/icon_cluster" />
     <item
-        android:id="@+id/mainmap3"
+        android:id="@+id/support"
         android:title="Support"
-        android:icon="@drawable/icon_cluster"/>
+        android:icon="@drawable/icon_cluster" />
+    <item
+        android:id="@+id/settings"
+        android:title="Support"
+        android:icon="@drawable/settings_active"/>
 </menu>
