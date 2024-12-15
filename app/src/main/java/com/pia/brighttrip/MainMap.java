@@ -114,7 +114,6 @@ public class MainMap extends Fragment {
 
                 // Enable traffic layer for additional map features
                 googleMap.setTrafficEnabled(true);
-
                 // TODO: Perform network operations with the constructed URL
             });
         }
