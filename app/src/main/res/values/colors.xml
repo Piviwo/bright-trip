@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="purple">#2C3676</color>
     <color name="darkgrey">#222222</color>
+    <color name="app_background">#3451A1</color>
+    <color name="yellow">#FFD800</color>
 </resources>
