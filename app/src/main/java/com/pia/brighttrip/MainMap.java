@@ -141,7 +141,6 @@ public class MainMap extends Fragment {
                 String baseUrl = "https://api.openrouteservice.org/v2/directions/foot-walking";
                 String start = BERLIN.longitude + "," + BERLIN.latitude;
                 String end = newPos.longitude + "," + newPos.latitude;
-                //String apiKey = "5b3ce3597851110001cf62487ffe36ced36242aeb94b33ecb7c2fff3";
                 String url = baseUrl + "?api_key=" + apiKey + "&start=" + start + "&end=" + end;
                 //todo new drawLine(googleMap).execute(url);
 
