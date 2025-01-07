@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -18,6 +18,9 @@ android {
 
         val apiKey: String = project.findProperty("GOOGLE_API_KEY") as String? ?: ""
         buildConfigField("String", "GOOGLE_API_KEY", "\"$apiKey\"")
+
+        val apiKey2: String = project.findProperty("OPEN_ROUTE_API_KEY") as String? ?: ""
+        buildConfigField("String", "OPEN_ROUTE_API_KEY", "\"$apiKey2\"")
     }
 
     buildTypes {
