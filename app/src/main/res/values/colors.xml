@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="app_text">#DFF7F8</color>
+    <color name="route">#F5F5F5</color>
     <color name="nav_bar_buttons">#5D7ACA</color>
     <color name="app_background">#3451A1</color>
     <color name="base_map_main">#051956 </color>
