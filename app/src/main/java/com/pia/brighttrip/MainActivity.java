@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -22,11 +24,16 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     LocationManager locationManager;
     LocationListener locationListener;
+    private LocationViewModel locationViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize ViewModel
+        locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
 
         // Initialize Bottom Navigation View
         bottomNavigationView = findViewById(R.id.btm_nav);
@@ -46,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 if (location != null) {
                     Toast.makeText(MainActivity.this, "Location: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+
+                    //share location with view model
+                    locationViewModel.setLocation(location);
                 }
             }
         };
