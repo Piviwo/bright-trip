@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,9 +20,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainMap extends Fragment {
     private static final LatLng BERLIN = new LatLng(52.520008, 13.404954);
@@ -29,9 +30,10 @@ public class MainMap extends Fragment {
 
     private GoogleMap googleMap;
     private Marker currentLocationMarker;
-    private LocationViewModel locationViewModel;
+    private Marker clickMarker;
+    private Polyline currentRoute;
 
-    private final List<Marker> clickMarkers = new ArrayList<>();
+    private LocationViewModel locationViewModel;
 
     @Nullable
     @Override
@@ -83,7 +85,8 @@ public class MainMap extends Fragment {
                 // Add a new marker for the current location
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(currentLatLng)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                        .title("Current Location");
                 currentLocationMarker = googleMap.addMarker(markerOptions);
             } else {
                 // Update the marker's position
@@ -124,19 +127,38 @@ public class MainMap extends Fragment {
 
     private void setupMapClickListener() {
         googleMap.setOnMapClickListener(newPos -> {
-            for (Marker marker : clickMarkers) {
-                marker.remove();
+            if (clickMarker != null){
+                clickMarker.remove();
             }
-            clickMarkers.clear();
-
-            Marker newMarker = googleMap.addMarker(new MarkerOptions()
+            clickMarker = googleMap.addMarker(new MarkerOptions()
                     .position(newPos)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-            if (newMarker != null) {
-                clickMarkers.add(newMarker);
+
+            drawRouteTo(newPos);
+        });
+    }
+
+    /**
+     * Draws a polyline between the current location and the specified position.
+     * @param destination The LatLng position of the new marker.
+     */
+    //todo: draw route with GOOGLE API
+    private void drawRouteTo(LatLng destination) {
+        if (currentLocationMarker != null && googleMap != null) {
+            // Get the current location marker's position
+            LatLng currentLatLng = currentLocationMarker.getPosition();
+
+            // Remove the previous polyline, if it exists
+            if (currentRoute != null) {
+                currentRoute.remove();
             }
 
-            //todo: draw route
-        });
+            // Draw a polyline between the current location and the destination
+            currentRoute = googleMap.addPolyline(new PolylineOptions()
+                    .add(currentLatLng, destination)
+                    .width(8)
+                    .color(Color.WHITE)
+                    .geodesic(true));
+        }
     }
 }
