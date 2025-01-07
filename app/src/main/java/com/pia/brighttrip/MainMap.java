@@ -154,7 +154,6 @@ public class MainMap extends Fragment {
      * Draws a polyline between the current location and the specified position.
      * @param destination The LatLng position of the new marker.
      */
-    //todo: draw route with GOOGLE API
     private void drawRouteTo(LatLng destination) {
         if (currentLocationMarker != null && googleMap != null) {
             // Get the current location marker's position
