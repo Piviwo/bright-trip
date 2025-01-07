@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.libraries.places.api.net.PlacesClient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +28,40 @@ public class MainMap extends Fragment {
     // Constants for default map settings
     private static final LatLng BERLIN = new LatLng(52.520008, 13.404954);
     private static final float INITIAL_ZOOM_LEVEL = 13.0f;
+    String apiKey = BuildConfig.GOOGLE_API_KEY;
+    private PlacesClient placesClient;
 
     // List to track markers added by user clicks
     private final List<Marker> clickMarkers = new ArrayList<>();
 
-    // Callback for map setup
+    @Nullable
+    @Override
+    /*part of the Android Fragment lifecycle and responsible for
+     * creating and returning the view hierarchy associated with the Fragment.
+     */
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_main_map, container, false);
+    }
+
+    /*called when the view associated with the Fragment has been created
+     * used to set up UI elements or perform operations that require the fragment's view hierarchy to be fully created
+     * configures a SupportMapFragment to display a Google Map within the Fragment*/
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Get the MapFragment and set up the callback
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(callback);
+        }
+    }
+
+    /*  callback function for map setup
+    * ensures  UI thread remains responsive, notifies when map is ready
+    * decouples  map's lifecycle from own logic*/
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         @Override
@@ -52,7 +82,9 @@ public class MainMap extends Fragment {
                         MapStyleOptions.loadRawResourceStyle(
                                 requireContext(), R.raw.map_style));
                 if (!success) {
-                    // Log failure to apply style (use logging mechanism as needed)
+                    // Log failure to apply style
+                    // tbc
+
                 }
             } catch (Exception e) {
                 e.printStackTrace(); // Log exceptions for debugging
@@ -66,7 +98,7 @@ public class MainMap extends Fragment {
         private void setupMapUI(GoogleMap googleMap) {
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); // Set map type to normal
             googleMap.getUiSettings().setZoomControlsEnabled(true); // Enable zoom controls
-            googleMap.getUiSettings().setMapToolbarEnabled(true); // Enable map toolbar
+            googleMap.getUiSettings().setMapToolbarEnabled(false); // Enable map toolbar
         }
 
         /**
@@ -105,37 +137,20 @@ public class MainMap extends Fragment {
                     clickMarkers.add(newMarker);
                 }
 
-                // Construct the API URL for route calculation (if needed)
+                // Construct the API URL for route calculation
                 String baseUrl = "https://api.openrouteservice.org/v2/directions/foot-walking";
                 String start = BERLIN.longitude + "," + BERLIN.latitude;
                 String end = newPos.longitude + "," + newPos.latitude;
-                String apiKey = "YOUR_API_KEY_HERE"; // Replace with a valid API key
+                //String apiKey = "5b3ce3597851110001cf62487ffe36ced36242aeb94b33ecb7c2fff3";
                 String url = baseUrl + "?api_key=" + apiKey + "&start=" + start + "&end=" + end;
+                //todo new drawLine(googleMap).execute(url);
 
-                // Enable traffic layer for additional map features
-                googleMap.setTrafficEnabled(true);
-                // TODO: Perform network operations with the constructed URL
+                //Enable traffic layer for additional map features
+                //googleMap.setTrafficEnabled(true);
             });
         }
+
+        //TODO: find places
+
     };
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_map, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        // Get the MapFragment and set up the callback
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(callback);
-        }
-    }
 }
