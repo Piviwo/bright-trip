@@ -17,13 +17,17 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
+import com.google.maps.android.data.geojson.GeoJsonPointStyle;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +40,7 @@ import java.net.URL;
 
 
 public class MainMap extends Fragment {
-    private static final LatLng BERLIN = new LatLng(52.520008, 13.404954);
+    private static final LatLng BERLIN = new LatLng(52.5308, 13.3472);
     private static final float INITIAL_ZOOM_LEVEL = 13.0f;
 
     private GoogleMap googleMap;
@@ -83,6 +87,32 @@ public class MainMap extends Fragment {
         setupMapUI();
         addInitialMarker();
         setupMapClickListener();
+        addLampLayer();
+    }
+    /**
+     * Adds the Geojson file with street lamps
+     */
+    private void addLampLayer(){
+        // Load the street lamps
+        try {
+            GeoJsonLayer layer = new GeoJsonLayer(googleMap, R.raw.moabit_lamps, requireContext());
+            BitmapDescriptor customIcon = BitmapDescriptorFactory.fromResource(R.drawable.moon);
+
+            // Iterate through each feature/point in the geojson layer
+            for (GeoJsonFeature feature : layer.getFeatures()) {
+                if (feature.hasGeometry() && feature.getGeometry() instanceof GeoJsonPoint) {
+                    //add our custom lamp icon
+                    GeoJsonPointStyle pointStyle = new GeoJsonPointStyle();
+                    pointStyle.setIcon(customIcon);
+                    feature.setPointStyle(pointStyle);
+                }
+            }
+            layer.addLayerToMap();
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            Log.e("GeoJsonError", "Error loading GeoJSON file: " + e.getMessage());
+        }
     }
 
     /**
@@ -110,6 +140,9 @@ public class MainMap extends Fragment {
         }
     }
 
+    /**
+    * Sets up styles for the basemap
+    */
     private void setupMapStyle() {
         try {
             boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
@@ -127,6 +160,9 @@ public class MainMap extends Fragment {
         googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
+    /**
+     * Adds an initial marker to the map and moves camera to Berlin-Moabit
+     */
     private void addInitialMarker() {
         MarkerOptions marker = new MarkerOptions()
                 .position(BERLIN)
@@ -137,9 +173,13 @@ public class MainMap extends Fragment {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
     }
 
+    /**
+     * Click listener for the map (on click selects a location)
+     */
     private void setupMapClickListener() {
         googleMap.setOnMapClickListener(newPos -> {
             if (clickMarker != null){
+                //remove previous markers
                 clickMarker.remove();
             }
             clickMarker = googleMap.addMarker(new MarkerOptions()
@@ -152,7 +192,6 @@ public class MainMap extends Fragment {
 
     /**
      * Draws a polyline between the current location and the specified position.
-     * @param destination The LatLng position of the new marker.
      */
     private void drawRouteTo(LatLng destination) {
         if (currentLocationMarker != null && googleMap != null) {
@@ -187,6 +226,9 @@ public class MainMap extends Fragment {
         }
     }
 
+    /**
+     * Downloads the geojson file of the route
+     */
     private class DownloadGeoJsonFile extends AsyncTask<String, Void, GeoJsonLayer> {
 
         @Override
