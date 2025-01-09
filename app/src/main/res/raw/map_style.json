@@ -80,9 +80,6 @@
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#051956"
-      },
-      {
         "weight": 1.5
       }
     ]
@@ -102,15 +99,6 @@
     "stylers": [
       {
         "color": "#023e58"
-      }
-    ]
-  },
-  {
-    "featureType": "landscape.natural.landcover",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#fae500"
       }
     ]
   },
