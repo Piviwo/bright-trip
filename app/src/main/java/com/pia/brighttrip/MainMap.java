@@ -96,7 +96,7 @@ public class MainMap extends Fragment {
         // Load the street lamps
         try {
             GeoJsonLayer layer = new GeoJsonLayer(googleMap, R.raw.moabit_lamps, requireContext());
-            BitmapDescriptor customIcon = BitmapDescriptorFactory.fromResource(R.drawable.moon);
+            BitmapDescriptor customIcon = BitmapDescriptorFactory.fromResource(R.drawable.lamp);
 
             // Iterate through each feature/point in the geojson layer
             for (GeoJsonFeature feature : layer.getFeatures()) {
