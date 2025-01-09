@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -15,6 +15,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKey: String = project.findProperty("GOOGLE_API_KEY") as String? ?: ""
+        buildConfigField("String", "GOOGLE_API_KEY", "\"$apiKey\"")
+
+        val apiKey2: String = project.findProperty("OPEN_ROUTE_API_KEY") as String? ?: ""
+        buildConfigField("String", "OPEN_ROUTE_API_KEY", "\"$apiKey2\"")
     }
 
     buildTypes {
@@ -26,6 +32,10 @@ android {
             )
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -44,4 +54,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation ("com.google.maps.android:android-maps-utils:2.3.0")
+    implementation ("com.google.android.libraries.places:places:2.7.0")
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
 }
