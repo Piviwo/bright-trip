@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -23,6 +24,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
@@ -37,18 +43,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
 
 
 public class MainMap extends Fragment {
     private static final LatLng BERLIN = new LatLng(52.5308, 13.3472);
-    private static final float INITIAL_ZOOM_LEVEL = 13.0f;
+    private static final float INITIAL_ZOOM_LEVEL = 15.0f;
 
     private GoogleMap googleMap;
     private Marker currentLocationMarker;
     private Marker clickMarker;
     private GeoJsonLayer currentGeoJsonLayer;
 
-    private final String apiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+    private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
+    private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+
     private LocationViewModel locationViewModel;
 
     @Nullable
@@ -71,6 +80,31 @@ public class MainMap extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(this::onMapReady);
         }
+
+        Places.initialize(requireContext().getApplicationContext(), googleApiKey);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+
+            }
+        });
+
 
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
@@ -202,7 +236,7 @@ public class MainMap extends Fragment {
             String url =
                     "https://api.openrouteservice.org/v2/directions/"
                             + "foot-walking"
-                            + "?api_key=" + apiKey
+                            + "?api_key=" + routingApiKey
                             + "&start="
                             + currentLatLng.longitude + ","
                             + currentLatLng.latitude

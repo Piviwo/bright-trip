@@ -6,7 +6,7 @@
     android:background="@color/app_background">
 
     <!-- Search Bar -->
-    <EditText
+<!--    <EditText
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,12 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#B3FFFFFF"
         android:inputType="text"
-        android:imeOptions="actionSearch" />
+        android:imeOptions="actionSearch" />-->
+    <fragment android:id="@+id/autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        />
 
     <!-- Map Fragment -->
     <fragment
@@ -26,7 +31,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_bar"
+        android:layout_below="@id/autocomplete_fragment"
         tools:context=".MainMap" />
 
 </RelativeLayout>

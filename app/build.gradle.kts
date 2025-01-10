@@ -16,11 +16,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val apiKey: String = project.findProperty("GOOGLE_API_KEY") as String? ?: ""
-        buildConfigField("String", "GOOGLE_API_KEY", "\"$apiKey\"")
+        val googleApiKey: String = project.findProperty("GOOGLE_API_KEY") as String? ?: ""
+        buildConfigField("String", "GOOGLE_API_KEY", "\"$googleApiKey\"")
 
-        val apiKey2: String = project.findProperty("OPEN_ROUTE_API_KEY") as String? ?: ""
-        buildConfigField("String", "OPEN_ROUTE_API_KEY", "\"$apiKey2\"")
+        val routingApiKey: String = project.findProperty("OPEN_ROUTE_API_KEY") as String? ?: ""
+        buildConfigField("String", "OPEN_ROUTE_API_KEY", "\"$routingApiKey\"")
     }
 
     buildTypes {
