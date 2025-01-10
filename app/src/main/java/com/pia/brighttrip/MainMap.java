@@ -24,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -141,6 +142,7 @@ public class MainMap extends Fragment {
                     } else {
                         clickMarker = googleMap.addMarker(new MarkerOptions()
                             .position(selectedLocation)
+                            .zIndex(1.0f)
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     }
 
@@ -214,6 +216,7 @@ public class MainMap extends Fragment {
                 // Add a new marker for the current location
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(currentLatLng)
+                        .zIndex(1.0f)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                         .title("Current Location");
                 currentLocationMarker = googleMap.addMarker(markerOptions);
@@ -270,6 +273,7 @@ public class MainMap extends Fragment {
                 clickMarker.remove();
             }
             clickMarker = googleMap.addMarker(new MarkerOptions()
+                    .zIndex(1.0f)
                     .position(newPos)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
@@ -358,8 +362,16 @@ public class MainMap extends Fragment {
                         .add(currentLocationMarker.getPosition(), clickMarker.getPosition())
                         .width(8)
                         .color(Color.WHITE)
+                        .zIndex(1.0f)
                         .geodesic(true));
             }
+
+            // Create LatLngBounds.Builder to include both marker positions
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(currentLocationMarker.getPosition());
+            builder.include(clickMarker.getPosition());
+            LatLngBounds bounds = builder.build();
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
         }
     }
 }
