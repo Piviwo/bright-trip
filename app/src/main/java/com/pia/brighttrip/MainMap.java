@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -87,8 +90,37 @@ public class MainMap extends Fragment {
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
+
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Change the default google style
+        if (autocompleteFragment != null) {
+            // Access the root view of the AutocompleteSupportFragment
+            View fragmentView = autocompleteFragment.getView();
+            if (fragmentView != null) {
+
+                fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
+
+                // Find the EditText within the fragment's view hierarchy
+                EditText editText = fragmentView.findViewById(
+                        com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+
+                if (editText != null) {
+                    editText.setTextColor(getResources().getColor(R.color.white));
+                    editText.setHintTextColor(getResources().getColor(R.color.white_grey));
+                }
+
+                ImageView searchIcon = fragmentView.findViewById(
+                        com.google.android.libraries.places.R.id.places_autocomplete_search_button);
+
+                if (searchIcon != null) {
+                    // Change the tint of the magnifier icon
+                    searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
+                            PorterDuff.Mode.SRC_IN);
+                }
+            }
+        }
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {

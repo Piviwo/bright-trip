@@ -5,20 +5,9 @@
     android:layout_width="match_parent"
     android:background="@color/app_background">
 
-    <!-- Search Bar -->
-<!--    <EditText
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Find Destination"
-        android:padding="12dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/search_bar"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#B3FFFFFF"
-        android:inputType="text"
-        android:imeOptions="actionSearch" />-->
-    <fragment android:id="@+id/autocomplete_fragment"
+    <!-- Autocomplete Fragment for the search bar -->
+    <fragment
+        android:id="@+id/autocomplete_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
