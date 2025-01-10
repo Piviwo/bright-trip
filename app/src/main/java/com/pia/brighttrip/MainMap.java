@@ -27,6 +27,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 
@@ -57,6 +59,7 @@ public class MainMap extends Fragment {
     private Marker currentLocationMarker;
     private Marker clickMarker;
     private GeoJsonLayer currentGeoJsonLayer;
+    private Polyline currentPolyline;
 
     private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
     private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
@@ -92,7 +95,7 @@ public class MainMap extends Fragment {
 
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         // Change the default google style
         if (autocompleteFragment != null) {
@@ -126,16 +129,34 @@ public class MainMap extends Fragment {
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                // TODO: Get info about the selected place.
 
+                // Get the LatLng of the selected place
+                LatLng selectedLocation = place.getLatLng();
+
+                // Check if LatLng is not null
+                if (selectedLocation != null) {
+                    // Remove the previous marker if it exists
+                    if (clickMarker != null) {
+                        clickMarker.setPosition(selectedLocation);
+                    } else {
+                        clickMarker = googleMap.addMarker(new MarkerOptions()
+                            .position(selectedLocation)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    }
+
+                    // Move and animate the camera to the selected place
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));
+                    drawRouteTo(selectedLocation);
+                }
             }
 
             @Override
             public void onError(@NonNull Status status) {
-                // TODO: Handle the error.
-
+                // Handle any errors
+                Log.e("PlaceSelectionError", "An error occurred: " + status);
             }
         });
+
 
 
         // Observe location updates
@@ -276,19 +297,6 @@ public class MainMap extends Fragment {
                             + clickMarker.getPosition().longitude + ","
                             + clickMarker.getPosition().latitude;
             new DownloadGeoJsonFile().execute(url);
-
-            /*
-            // Remove the previous polyline, if it exists
-            if (currentRoute != null) {
-                currentRoute.remove();
-            }
-
-            // Draw a polyline between the current location and the destination
-            currentRoute = googleMap.addPolyline(new PolylineOptions()
-                    .add(currentLatLng, destination)
-                    .width(8)
-                    .color(Color.WHITE)
-                    .geodesic(true));*/
         }
     }
 
@@ -326,6 +334,9 @@ public class MainMap extends Fragment {
 
         @Override
         protected void onPostExecute(GeoJsonLayer layer) {
+            if (currentPolyline != null) {
+                currentPolyline.remove();
+            }
             if (layer != null) {
                 // Remove the old layer if it exists
                 if (currentGeoJsonLayer != null) {
@@ -342,6 +353,12 @@ public class MainMap extends Fragment {
 
                 // Update the reference to the current layer
                 currentGeoJsonLayer = layer;
+            } else {
+                currentPolyline = googleMap.addPolyline(new PolylineOptions()
+                        .add(currentLocationMarker.getPosition(), clickMarker.getPosition())
+                        .width(8)
+                        .color(Color.WHITE)
+                        .geodesic(true));
             }
         }
     }
