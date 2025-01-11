@@ -2,9 +2,11 @@ package com.pia.brighttrip;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
@@ -16,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.Manifest;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,6 +59,7 @@ import java.util.Arrays;
 public class MainMap extends Fragment {
     private static final LatLng BERLIN = new LatLng(52.5308, 13.3472);
     private static final float INITIAL_ZOOM_LEVEL = 15.0f;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private GoogleMap googleMap;
     private Marker currentLocationMarker;
@@ -88,14 +93,25 @@ public class MainMap extends Fragment {
             mapFragment.getMapAsync(this::onMapReady);
         }
 
+        setUpFindPlaces();
+
+        // Observe location updates
+        locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
+    }
+
+    /**
+     * Sets up the search input for finding places with google places API
+     */
+    private void setUpFindPlaces(){
+
+        // Initialize the Places API and AutocompleteSupportFragment.
         Places.initialize(requireContext().getApplicationContext(), googleApiKey);
 
-        // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
 
-        // Specify the types of place data to return.
+        // Specify data of a place to return at request
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         // Change the default google style
@@ -126,7 +142,7 @@ public class MainMap extends Fragment {
             }
         }
 
-        // Set up a PlaceSelectionListener to handle the response.
+        // Set up a PlaceSelectionListener to handle the response
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
@@ -141,9 +157,9 @@ public class MainMap extends Fragment {
                         clickMarker.setPosition(selectedLocation);
                     } else {
                         clickMarker = googleMap.addMarker(new MarkerOptions()
-                            .position(selectedLocation)
-                            .zIndex(1.0f)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                                .position(selectedLocation)
+                                .zIndex(1.0f)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     }
 
                     // Move and animate the camera to the selected place
@@ -158,11 +174,6 @@ public class MainMap extends Fragment {
                 Log.e("PlaceSelectionError", "An error occurred: " + status);
             }
         });
-
-
-
-        // Observe location updates
-        locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
     }
 
     /**
@@ -171,10 +182,7 @@ public class MainMap extends Fragment {
      */
     private void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-
-        setupMapStyle();
         setupMapUI();
-        addInitialMarker();
         setupMapClickListener();
         addLampLayer();
     }
@@ -222,49 +230,49 @@ public class MainMap extends Fragment {
                 currentLocationMarker = googleMap.addMarker(markerOptions);
             } else {
                 // Update the marker's position
-                currentLocationMarker.setPosition(currentLatLng);
             }
-
-            // Move the camera to the current location
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, INITIAL_ZOOM_LEVEL));
-        }
-    }
-
-    /**
-    * Sets up styles for the basemap
-    */
-    private void setupMapStyle() {
-        try {
-            boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
-            if (!success) {
-                // Log failure to apply style
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // Log exceptions for debugging
         }
     }
 
     private void setupMapUI() {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+
+        // Enable location features
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        } else {
+            requestLocationPermission();
+        }
+
+        // Set listeners for location button and location click events
+        googleMap.setOnMyLocationButtonClickListener(() -> {
+            Toast.makeText(getContext(), "My Location button clicked", Toast.LENGTH_SHORT).show();
+            return false;
+        });
+
+        googleMap.setOnMyLocationClickListener(location -> {
+            Toast.makeText(getContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     /**
-     * Adds an initial marker to the map and moves camera to Berlin-Moabit
+     * Function to request location permission if not set
      */
-    private void addInitialMarker() {
-        MarkerOptions marker = new MarkerOptions()
-                .position(BERLIN)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .alpha(0.8f);
-        googleMap.addMarker(marker);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
+    private void requestLocationPermission() {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Show an explanation to the user asynchronously
+            Toast.makeText(getContext(), "Location permission is required to use this feature.", Toast.LENGTH_SHORT).show();
+        }
+        // Request the permission
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
     }
 
     /**
-     * Click listener for the map (on click selects a location)
+     * Click listener for the map to select a location
      */
     private void setupMapClickListener() {
         googleMap.setOnMapClickListener(newPos -> {
@@ -305,7 +313,7 @@ public class MainMap extends Fragment {
     }
 
     /**
-     * Downloads the geojson file of the route
+     * Downloads the geojson file of the route between to locations
      */
     private class DownloadGeoJsonFile extends AsyncTask<String, Void, GeoJsonLayer> {
 
