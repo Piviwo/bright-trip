@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             fragment = new MainMap();
 
         if (item.getItemId() == R.id.explore)
-            fragment = new MainMap();
+            fragment = new ExploreFragment();
 
         if (item.getItemId() == R.id.support)
             fragment = new SupportFragment();
