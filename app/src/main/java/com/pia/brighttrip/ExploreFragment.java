@@ -52,12 +52,11 @@ public class ExploreFragment extends Fragment {
 
         // Query the database
         try {
-            dbCursor = database.rawQuery("SELECT * FROM pois_moabit;", null);
+            dbCursor = database.rawQuery("SELECT * FROM pois_moabit WHERE name IS NOT NULL;", null);
             ArrayAdapter<CharSequence> adapter = createAdapterHtml(dbCursor);
             list_view.setAdapter(adapter);
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle query failure gracefully
         }
     }
 
@@ -72,10 +71,13 @@ public class ExploreFragment extends Fragment {
         Spanned[] html_array = new Spanned[length];
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
+        double xcoord = cursor.getColumnIndex("xcoord");
+        double ycoord = cursor.getColumnIndex("ycoord");
+
 
         for (int i = 0; i < length; i++) {
             html_array[i] = Html.fromHtml(cursor.getString(index_name) + "<br><i>"
-                    + cursor.getString(index_fclass) + "</i>");
+                    + cursor.getString(index_fclass) + "</i><br>" + "{AdressPlaceholder}") ;
             cursor.moveToNext();
         }
 
