@@ -2,10 +2,13 @@ package com.pia.brighttrip;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,16 +16,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+import android.Manifest;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
@@ -37,18 +53,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
 
 
 public class MainMap extends Fragment {
     private static final LatLng BERLIN = new LatLng(52.5308, 13.3472);
-    private static final float INITIAL_ZOOM_LEVEL = 13.0f;
+    private static final float INITIAL_ZOOM_LEVEL = 15.0f;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private GoogleMap googleMap;
     private Marker currentLocationMarker;
     private Marker clickMarker;
     private GeoJsonLayer currentGeoJsonLayer;
+    private Polyline currentPolyline;
 
-    private final String apiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+    private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
+    private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+
     private LocationViewModel locationViewModel;
 
     @Nullable
@@ -72,8 +93,87 @@ public class MainMap extends Fragment {
             mapFragment.getMapAsync(this::onMapReady);
         }
 
+        setUpFindPlaces();
+
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
+    }
+
+    /**
+     * Sets up the search input for finding places with google places API
+     */
+    private void setUpFindPlaces(){
+
+        // Initialize the Places API and AutocompleteSupportFragment.
+        Places.initialize(requireContext().getApplicationContext(), googleApiKey);
+
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+
+        // Specify data of a place to return at request
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Change the default google style
+        if (autocompleteFragment != null) {
+            // Access the root view of the AutocompleteSupportFragment
+            View fragmentView = autocompleteFragment.getView();
+            if (fragmentView != null) {
+
+                fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
+
+                // Find the EditText within the fragment's view hierarchy
+                EditText editText = fragmentView.findViewById(
+                        com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+
+                if (editText != null) {
+                    editText.setTextColor(getResources().getColor(R.color.white));
+                    editText.setHintTextColor(getResources().getColor(R.color.white_grey));
+                }
+
+                ImageView searchIcon = fragmentView.findViewById(
+                        com.google.android.libraries.places.R.id.places_autocomplete_search_button);
+
+                if (searchIcon != null) {
+                    // Change the tint of the magnifier icon
+                    searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
+                            PorterDuff.Mode.SRC_IN);
+                }
+            }
+        }
+
+        // Set up a PlaceSelectionListener to handle the response
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+
+                // Get the LatLng of the selected place
+                LatLng selectedLocation = place.getLatLng();
+
+                // Check if LatLng is not null
+                if (selectedLocation != null) {
+                    // Remove the previous marker if it exists
+                    if (clickMarker != null) {
+                        clickMarker.setPosition(selectedLocation);
+                    } else {
+                        clickMarker = googleMap.addMarker(new MarkerOptions()
+                                .position(selectedLocation)
+                                .zIndex(1.0f)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    }
+
+                    // Move and animate the camera to the selected place
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));
+                    drawRouteTo(selectedLocation);
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // Handle any errors
+                Log.e("PlaceSelectionError", "An error occurred: " + status);
+            }
+        });
     }
 
     /**
@@ -82,10 +182,7 @@ public class MainMap extends Fragment {
      */
     private void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-
-        setupMapStyle();
         setupMapUI();
-        addInitialMarker();
         setupMapClickListener();
         addLampLayer();
     }
@@ -127,54 +224,55 @@ public class MainMap extends Fragment {
                 // Add a new marker for the current location
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(currentLatLng)
+                        .zIndex(1.0f)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                         .title("Current Location");
                 currentLocationMarker = googleMap.addMarker(markerOptions);
             } else {
                 // Update the marker's position
-                currentLocationMarker.setPosition(currentLatLng);
             }
-
-            // Move the camera to the current location
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, INITIAL_ZOOM_LEVEL));
-        }
-    }
-
-    /**
-    * Sets up styles for the basemap
-    */
-    private void setupMapStyle() {
-        try {
-            boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
-            if (!success) {
-                // Log failure to apply style
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // Log exceptions for debugging
         }
     }
 
     private void setupMapUI() {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+
+        // Enable location features
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        } else {
+            requestLocationPermission();
+        }
+
+        // Set listeners for location button and location click events
+        googleMap.setOnMyLocationButtonClickListener(() -> {
+            Toast.makeText(getContext(), "My Location button clicked", Toast.LENGTH_SHORT).show();
+            return false;
+        });
+
+        googleMap.setOnMyLocationClickListener(location -> {
+            Toast.makeText(getContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     /**
-     * Adds an initial marker to the map and moves camera to Berlin-Moabit
+     * Function to request location permission if not set
      */
-    private void addInitialMarker() {
-        MarkerOptions marker = new MarkerOptions()
-                .position(BERLIN)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .alpha(0.8f);
-        googleMap.addMarker(marker);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
+    private void requestLocationPermission() {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Show an explanation to the user asynchronously
+            Toast.makeText(getContext(), "Location permission is required to use this feature.", Toast.LENGTH_SHORT).show();
+        }
+        // Request the permission
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
     }
 
     /**
-     * Click listener for the map (on click selects a location)
+     * Click listener for the map to select a location
      */
     private void setupMapClickListener() {
         googleMap.setOnMapClickListener(newPos -> {
@@ -183,6 +281,7 @@ public class MainMap extends Fragment {
                 clickMarker.remove();
             }
             clickMarker = googleMap.addMarker(new MarkerOptions()
+                    .zIndex(1.0f)
                     .position(newPos)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
@@ -202,7 +301,7 @@ public class MainMap extends Fragment {
             String url =
                     "https://api.openrouteservice.org/v2/directions/"
                             + "foot-walking"
-                            + "?api_key=" + apiKey
+                            + "?api_key=" + routingApiKey
                             + "&start="
                             + currentLatLng.longitude + ","
                             + currentLatLng.latitude
@@ -210,24 +309,11 @@ public class MainMap extends Fragment {
                             + clickMarker.getPosition().longitude + ","
                             + clickMarker.getPosition().latitude;
             new DownloadGeoJsonFile().execute(url);
-
-            /*
-            // Remove the previous polyline, if it exists
-            if (currentRoute != null) {
-                currentRoute.remove();
-            }
-
-            // Draw a polyline between the current location and the destination
-            currentRoute = googleMap.addPolyline(new PolylineOptions()
-                    .add(currentLatLng, destination)
-                    .width(8)
-                    .color(Color.WHITE)
-                    .geodesic(true));*/
         }
     }
 
     /**
-     * Downloads the geojson file of the route
+     * Downloads the geojson file of the route between to locations
      */
     private class DownloadGeoJsonFile extends AsyncTask<String, Void, GeoJsonLayer> {
 
@@ -260,6 +346,9 @@ public class MainMap extends Fragment {
 
         @Override
         protected void onPostExecute(GeoJsonLayer layer) {
+            if (currentPolyline != null) {
+                currentPolyline.remove();
+            }
             if (layer != null) {
                 // Remove the old layer if it exists
                 if (currentGeoJsonLayer != null) {
@@ -276,7 +365,21 @@ public class MainMap extends Fragment {
 
                 // Update the reference to the current layer
                 currentGeoJsonLayer = layer;
+            } else {
+                currentPolyline = googleMap.addPolyline(new PolylineOptions()
+                        .add(currentLocationMarker.getPosition(), clickMarker.getPosition())
+                        .width(8)
+                        .color(Color.WHITE)
+                        .zIndex(1.0f)
+                        .geodesic(true));
             }
+
+            // Create LatLngBounds.Builder to include both marker positions
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(currentLocationMarker.getPosition());
+            builder.include(clickMarker.getPosition());
+            LatLngBounds bounds = builder.build();
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
         }
     }
 }
