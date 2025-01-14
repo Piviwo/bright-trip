@@ -127,8 +127,8 @@
             android:id="@+id/call_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:dividerHeight="1dp"
-            android:divider="@color/yellow"/>
+            android:divider="@color/nav_bar_buttons"
+            android:dividerHeight="1dp" />
 
     </LinearLayout>
 </LinearLayout>
