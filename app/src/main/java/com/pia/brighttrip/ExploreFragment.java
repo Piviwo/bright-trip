@@ -8,8 +8,10 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +60,14 @@ public class ExploreFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object clickedItem = parent.getItemAtPosition(position);
+                Toast.makeText(getContext(), "Clicked: " + clickedItem.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private ArrayAdapter<CharSequence> createAdapterHtml(Cursor cursor) {
