@@ -7,33 +7,68 @@
     android:background="@color/app_background"
     android:orientation="vertical"
     android:padding="16dp">
-    <LinearLayout
+
+    <!-- FrameLayout to allow title on top of image -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="230dp">
+
+        <!-- Team Photo -->
+        <ImageView
+            android:id="@+id/team_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/team_photo"
+            android:contentDescription="Team photo" />
+
+        <!-- Title (About the App) placed on top of the image -->
+        <TextView
+            android:id="@+id/about_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="About the App"
+            android:textColor="@color/base_map_main"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_gravity="top|start"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="6dp"/>
+
+    </FrameLayout>
+
+    <!-- Welcome Text below Image (Below the Team Photo) -->
+    <TextView
+        android:id="@+id/about_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="24dp"
-        android:elevation="4dp"
-        android:orientation="vertical"
-        android:padding="20dp">
-        <!-- Heading -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginBottom="25dp"
-            android:text="About the app"
-            android:textColor="@color/yellow"
-            android:textSize="25sp"
-            android:textStyle="bold" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:text="blablabla"
-            android:textColor="@color/yellow"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
-    </LinearLayout>
+        android:text="Welcome to BrightTrip, your trusted companion for safe night commutes!"
+        android:textColor="@color/yellow"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- More Info Text (Further Details) below the Welcome Text -->
+    <TextView
+        android:id="@+id/about_more_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/yellow"
+        android:text="BrightTrip was created by Pia Wolffram and Tanya Pozdnyakova, students of the M.Sc. Cartography program. Driven by a shared passion for enhancing community safety, we aimed to design a practical, user-friendly app that helps individuals to commute confidently during late-night hours. Leveraging our skills in cartography, design, and development, we worked together to bring this app to life. Whether you're a resident or a visitor, BrightTrip is here to ensure you feel secure and informed every step of the way."
+        android:textSize="18sp"
+        android:lineSpacingExtra="6dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Heart Icon centered horizontally below the Text Content -->
+    <ImageView
+        android:id="@+id/heart_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Heart icon"
+        android:src="@drawable/heart" />
+
 </LinearLayout>
