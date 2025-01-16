@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import android.net.Uri;
+import android.widget.TextView;
 
 public class SupportFragment extends Fragment {
 

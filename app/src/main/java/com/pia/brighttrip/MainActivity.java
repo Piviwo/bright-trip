@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.support)
             fragment = new SupportFragment();
 
-        if (item.getItemId() == R.id.settings)
+        if (item.getItemId() == R.id.about)
             fragment = new SettingsFragment();
 
         if (fragment != null)

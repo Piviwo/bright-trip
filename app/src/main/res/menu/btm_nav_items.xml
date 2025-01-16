@@ -13,7 +13,7 @@
         android:title="Support"
         android:icon="@drawable/support_active" />
     <item
-        android:id="@+id/settings"
-        android:title="Settings"
-        android:icon="@drawable/settings_active"/>
+        android:id="@+id/about"
+        android:title="About"
+        android:icon="@drawable/about_active"/>
 </menu>
