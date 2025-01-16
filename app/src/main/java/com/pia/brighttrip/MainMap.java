@@ -202,6 +202,10 @@ public class MainMap extends Fragment {
                     //add our custom lamp icon
                     GeoJsonPointStyle pointStyle = new GeoJsonPointStyle();
                     pointStyle.setIcon(customIcon);
+
+                    // Set the anchor to center the icon
+                    pointStyle.setAnchor(0.5f, 0.5f);
+
                     feature.setPointStyle(pointStyle);
                 }
             }
