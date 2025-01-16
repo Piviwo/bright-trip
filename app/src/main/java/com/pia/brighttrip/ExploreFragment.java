@@ -1,5 +1,6 @@
 package com.pia.brighttrip;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 
@@ -64,10 +67,21 @@ public class ExploreFragment extends Fragment {
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object clickedItem = parent.getItemAtPosition(position);
-                Toast.makeText(getContext(), "Clicked: " + clickedItem.toString(), Toast.LENGTH_SHORT).show();
+                //String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
+
+                MainMap mainMapFragment = new MainMap();
+
+                // Navigate to MainMapFragment
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.rel_layout, mainMapFragment)
+                        .commit();
+
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.btm_nav);
+                bottomNavigationView.setSelectedItemId(R.id.mainmap);
             }
         });
+
     }
 
     private ArrayAdapter<CharSequence> createAdapterHtml(Cursor cursor) {
