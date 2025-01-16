@@ -362,7 +362,8 @@ public class MainMap extends Fragment {
 
                 // Style the new layer
                 GeoJsonLineStringStyle lineStringStyle = layer.getDefaultLineStringStyle();
-                lineStringStyle.setColor(Color.WHITE);
+                // lineStringStyle.setColor(Color.WHITE);
+                lineStringStyle.setColor(ContextCompat.getColor(requireContext(), R.color.route_color));
                 lineStringStyle.setWidth(10f);
 
                 // Add the new layer to the map
@@ -374,7 +375,8 @@ public class MainMap extends Fragment {
                 currentPolyline = googleMap.addPolyline(new PolylineOptions()
                         .add(currentLocationMarker.getPosition(), clickMarker.getPosition())
                         .width(8)
-                        .color(Color.WHITE)
+                        //.color(Color.WHITE)
+                        .color(ContextCompat.getColor(requireContext(), R.color.route_color))
                         .zIndex(1.0f)
                         .geodesic(true));
             }
