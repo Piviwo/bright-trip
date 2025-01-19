@@ -97,6 +97,30 @@ public class MainMap extends Fragment {
 
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
+
+        // Retrieve the arguments passed from ExploreFragment
+        Bundle args = getArguments();
+        if (args != null) {
+            String name = args.getString("name", "Unknown");
+            Double xCoord = args.getDouble("xcoord", 0);
+            Double yCoord = args.getDouble("ycoord", 0);
+            // Call a method to show the location on the map
+            showLocationOnMap(xCoord, yCoord);
+            Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Handles the map being ready for interaction.
+     * @param googleMap The GoogleMap instance.
+     */
+    private void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        setupMapUI();
+        setupMapClickListener();
+        addLampLayer();
     }
 
     /**
@@ -176,16 +200,18 @@ public class MainMap extends Fragment {
         });
     }
 
-    /**
-     * Handles the map being ready for interaction.
-     * @param googleMap The GoogleMap instance.
-     */
-    private void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        setupMapUI();
-        setupMapClickListener();
-        addLampLayer();
+    private void showLocationOnMap(Double xCoord, Double yCoord) {
+        if (googleMap == null) {
+            Log.e("showLocationOnMap", "googleMap is not initialized yet!");
+            return;
+        }
+        LatLng position = new LatLng(xCoord, yCoord);
+        googleMap.addMarker(new MarkerOptions()
+                .position(position)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
+
     /**
      * Adds the Geojson file with street lamps
      */

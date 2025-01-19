@@ -1,11 +1,13 @@
 package com.pia.brighttrip;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,9 +69,20 @@ public class ExploreFragment extends Fragment {
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
-
                 MainMap mainMapFragment = new MainMap();
+                Bundle bundle = new Bundle();
+
+                if (dbCursor != null && dbCursor.moveToPosition(position)) {
+                    @SuppressLint("Range") String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
+                    @SuppressLint("Range") Double xcoord = dbCursor.getDouble(dbCursor.getColumnIndex("xcoord"));
+                    @SuppressLint("Range") Double ycoord = dbCursor.getDouble(dbCursor.getColumnIndex("ycoord"));
+                    bundle.putString("name", name);
+                    bundle.putDouble("xcoord", xcoord);
+                    bundle.putDouble("ycoord", ycoord);
+                    mainMapFragment.setArguments(bundle);
+                } else {
+                    Log.e("ExploreFragment", "Cursor is null or unable to move to position: " + position);
+                }
 
                 // Navigate to MainMapFragment
                 requireActivity().getSupportFragmentManager()
@@ -100,10 +113,18 @@ public class ExploreFragment extends Fragment {
 
 
         for (int i = 0; i < length; i++) {
-            html_array[i] = Html.fromHtml(cursor.getString(index_name) + "<br><i>"
-                    + cursor.getString(index_fclass) + "</i><br>" + "{AdressPlaceholder}") ;
+            String name = cursor.getString(index_name).toUpperCase();
+            String fclass = cursor.getString(index_fclass).toUpperCase();
+
+            html_array[i] = Html.fromHtml(
+                    "<b><span style='font-size:24sp;'>" + name + "</span></b><br><br>" +
+                            "<i><span style='font-size:18sp;'>" + fclass + "</span></i><br>" +
+                            "{AdressPlaceholder}"
+            );
             cursor.moveToNext();
         }
+
+
 
         return new ArrayAdapter<>(requireContext(), R.layout.list_item, html_array);
     }
