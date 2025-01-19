@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -105,6 +107,7 @@ public class MainMap extends Fragment {
             Double xCoord = args.getDouble("xcoord", 0);
             Double yCoord = args.getDouble("ycoord", 0);
             // Call a method to show the location on the map
+            // todo: doesnt work! map is not initialized yet!
             showLocationOnMap(xCoord, yCoord);
             Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
         } else {
@@ -251,8 +254,8 @@ public class MainMap extends Fragment {
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(currentLatLng)
                         .zIndex(1.0f)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                        .title("Current Location");
+                        .visible(false)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                 currentLocationMarker = googleMap.addMarker(markerOptions);
             } else {
                 // Update the marker's position
@@ -270,13 +273,14 @@ public class MainMap extends Fragment {
         // Enable location features
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.getUiSettings().setCompassEnabled(true);
         } else {
             requestLocationPermission();
         }
 
         // Set listeners for location button and location click events
         googleMap.setOnMyLocationButtonClickListener(() -> {
-            Toast.makeText(getContext(), "My Location button clicked", Toast.LENGTH_SHORT).show();
             return false;
         });
 
