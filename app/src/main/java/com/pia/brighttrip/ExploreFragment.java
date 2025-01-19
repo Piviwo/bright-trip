@@ -1,7 +1,6 @@
 package com.pia.brighttrip;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -123,8 +122,6 @@ public class ExploreFragment extends Fragment {
             );
             cursor.moveToNext();
         }
-
-
 
         return new ArrayAdapter<>(requireContext(), R.layout.list_item, html_array);
     }
