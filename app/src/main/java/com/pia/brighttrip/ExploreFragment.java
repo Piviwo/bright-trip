@@ -115,6 +115,7 @@ public class ExploreFragment extends Fragment {
             String name = cursor.getString(index_name).toUpperCase();
             String fclass = cursor.getString(index_fclass).toUpperCase();
 
+            //todo: try table
             html_array[i] = Html.fromHtml(
                     "<b><span style='font-size:24sp;'>" + name + "</span></b><br><br>" +
                             "<i><span style='font-size:18sp;'>" + fclass + "</span></i><br>" +
