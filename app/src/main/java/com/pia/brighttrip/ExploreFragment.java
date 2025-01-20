@@ -108,7 +108,7 @@ public class ExploreFragment extends Fragment {
         int index_name = cursor.getColumnIndex("name");
         int index_xcoord = cursor.getColumnIndex("xcoord");
         int index_ycoord = cursor.getColumnIndex("ycoord");
-        int index_address = cursor.getColumnIndex("address");
+        //int index_address = cursor.getColumnIndex("address");
         int index_opens = cursor.getColumnIndex("opens");
         int index_closes = cursor.getColumnIndex("closes");
 
@@ -116,15 +116,17 @@ public class ExploreFragment extends Fragment {
         for (int i = 0; i < length; i++) {
             String name = cursor.getString(index_name).toUpperCase();
             String fclass = cursor.getString(index_fclass).toUpperCase();
-            String opens = cursor.getString(index_opens);
-            String closes = cursor.getString(index_closes);
+            String opens = cursor.getString(index_opens).substring(0, 5);
+            String closes = cursor.getString(index_closes).substring(0, 5);
+            //String address = cursor.getString(index_address).toUpperCase();
 
             //todo: try table
+            String color = "FBD437";
             html_array[i] = Html.fromHtml(
                     "<b><span>" + name + "</span></b><br><br>" +
                             "<i><span>" + fclass + "</span></i><br>" +
-                            "{AdressPlaceholder} <br><br>" +
-                            "<span> Open from: " + opens + " to " + closes + "</span>"
+                            "<span>" + "address" + "</span><br><br>" +
+                            "<span style='color:" + color + ";'> open from: " + opens + " to " + closes + "</span>"
             );
             cursor.moveToNext();
         }
