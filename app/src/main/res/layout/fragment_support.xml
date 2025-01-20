@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="left"
             android:layout_marginBottom="20dp"
             android:text="Here is what you can do:"
             android:textColor="@color/yellow"
@@ -60,6 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Move to a well-lit area"
+                    android:layout_marginLeft="8dp"
                     android:textColor="@color/yellow"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -82,6 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Find a crowded place"
+                    android:layout_marginLeft="8dp"
                     android:textColor="@color/yellow"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -104,6 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Call for help if needed"
+                    android:layout_marginLeft="8dp"
                     android:textColor="@color/yellow"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -127,8 +130,8 @@
             android:id="@+id/call_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:dividerHeight="1dp"
-            android:divider="@color/yellow"/>
+            android:divider="@color/nav_bar_buttons"
+            android:dividerHeight="1dp" />
 
     </LinearLayout>
 </LinearLayout>
