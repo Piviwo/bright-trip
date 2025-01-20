@@ -159,7 +159,7 @@ public class MainMap extends Fragment {
                         clickMarker = googleMap.addMarker(new MarkerOptions()
                                 .position(selectedLocation)
                                 .zIndex(1.0f)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                     }
 
                     // Move and animate the camera to the selected place
@@ -284,7 +284,7 @@ public class MainMap extends Fragment {
             clickMarker = googleMap.addMarker(new MarkerOptions()
                     .zIndex(1.0f)
                     .position(newPos)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
 
             drawRouteTo(newPos);
         });
