@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -41,7 +39,6 @@ import com.google.android.libraries.places.api.model.Place;
 
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
@@ -74,8 +71,8 @@ public class MainMap extends Fragment {
     private Double yCoord;
     private boolean areCoordinatesInitialized = false;
 
-    private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
-    private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+    private final String googleApiKey = BuildConfig.GOOGLE_API_KEY;
+    private final String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
 
     private LocationViewModel locationViewModel;
 
@@ -141,35 +138,29 @@ public class MainMap extends Fragment {
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-
         // Specify data of a place to return at request
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        View fragmentView = autocompleteFragment.getView();
+        if (fragmentView != null) {
 
-        // Change the default google style
-        if (autocompleteFragment != null) {
-            // Access the root view of the AutocompleteSupportFragment
-            View fragmentView = autocompleteFragment.getView();
-            if (fragmentView != null) {
+            fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
 
-                fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
+            // Find the EditText within the fragment's view hierarchy
+            EditText editText = fragmentView.findViewById(
+                    com.google.android.libraries.places.R.id.places_autocomplete_search_input);
 
-                // Find the EditText within the fragment's view hierarchy
-                EditText editText = fragmentView.findViewById(
-                        com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+            if (editText != null) {
+                editText.setTextColor(getResources().getColor(R.color.white));
+                editText.setHintTextColor(getResources().getColor(R.color.white_grey));
+            }
 
-                if (editText != null) {
-                    editText.setTextColor(getResources().getColor(R.color.white));
-                    editText.setHintTextColor(getResources().getColor(R.color.white_grey));
-                }
+            ImageView searchIcon = fragmentView.findViewById(
+                    com.google.android.libraries.places.R.id.places_autocomplete_search_button);
 
-                ImageView searchIcon = fragmentView.findViewById(
-                        com.google.android.libraries.places.R.id.places_autocomplete_search_button);
-
-                if (searchIcon != null) {
-                    // Change the tint of the magnifier icon
-                    searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
-                            PorterDuff.Mode.SRC_IN);
-                }
+            if (searchIcon != null) {
+                // Change the tint of the magnifier icon
+                searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
+                        PorterDuff.Mode.SRC_IN);
             }
         }
 
