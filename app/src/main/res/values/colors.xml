@@ -20,4 +20,5 @@
     <color name="dark_blue">#051956 </color>
     <color name="darkgrey">#222222</color>
     <color name="yellow">#FFD800</color>
+    <color name="route_color">#C3FDFF</color>
 </resources>
