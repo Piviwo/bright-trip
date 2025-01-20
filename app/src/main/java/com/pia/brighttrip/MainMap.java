@@ -231,6 +231,7 @@ public class MainMap extends Fragment {
                     GeoJsonPointStyle pointStyle = new GeoJsonPointStyle();
                     pointStyle.setIcon(customIcon);
                     feature.setPointStyle(pointStyle);
+                    pointStyle.setAnchor(0.5f, 0.5f);
                 }
             }
             layer.addLayerToMap();
