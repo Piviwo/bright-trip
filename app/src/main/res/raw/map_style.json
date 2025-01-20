@@ -8,14 +8,6 @@
     ]
   },
   {
-    "elementType": "labels",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
     "elementType": "labels.text.fill",
     "stylers": [
       {
@@ -55,11 +47,24 @@
     "stylers": [
       {
         "color": "#64779e"
+      },
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.locality",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },
   {
     "featureType": "administrative.neighborhood",
+    "elementType": "labels.text",
     "stylers": [
       {
         "visibility": "off"
@@ -143,6 +148,9 @@
     "stylers": [
       {
         "color": "#023e58"
+      },
+      {
+        "visibility": "on"
       }
     ]
   },
@@ -151,7 +159,10 @@
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#3C7680"
+        "color": "#3c7680"
+      },
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -187,7 +198,7 @@
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#98a5be"
+        "color": "#a3b3e1"
       }
     ]
   },
@@ -196,7 +207,7 @@
     "elementType": "labels.text.stroke",
     "stylers": [
       {
-        "color": "#1d2c4d"
+        "color": "#19264d"
       }
     ]
   },
@@ -224,24 +235,6 @@
     "stylers": [
       {
         "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#b0d5ce"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#023e58"
       }
     ]
   },

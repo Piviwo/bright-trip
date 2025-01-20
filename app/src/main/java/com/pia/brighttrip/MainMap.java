@@ -67,8 +67,12 @@ public class MainMap extends Fragment {
     private GeoJsonLayer currentGeoJsonLayer;
     private Polyline currentPolyline;
 
-    private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
-    private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
+    private Double xCoord;
+    private Double yCoord;
+    private boolean areCoordinatesInitialized = false;
+
+    private final String googleApiKey = BuildConfig.GOOGLE_API_KEY;
+    private final String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
 
     private LocationViewModel locationViewModel;
 
@@ -97,6 +101,30 @@ public class MainMap extends Fragment {
 
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
+        // Retrieve the arguments passed from ExploreFragment
+        Bundle args = getArguments();
+        if (args != null) {
+            xCoord = args.getDouble("xcoord", 0);
+            yCoord = args.getDouble("ycoord", 0);
+            areCoordinatesInitialized = true;
+            Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Handles the map being ready for interaction.
+     * @param googleMap The GoogleMap instance.
+     */
+    private void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        setupMapUI();
+        setupMapClickListener();
+        if (areCoordinatesInitialized) {
+            showLocationOnMap();
+        }
+        addLampLayer();
     }
 
     /**
@@ -110,35 +138,29 @@ public class MainMap extends Fragment {
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-
         // Specify data of a place to return at request
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        View fragmentView = autocompleteFragment.getView();
+        if (fragmentView != null) {
 
-        // Change the default google style
-        if (autocompleteFragment != null) {
-            // Access the root view of the AutocompleteSupportFragment
-            View fragmentView = autocompleteFragment.getView();
-            if (fragmentView != null) {
+            fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
 
-                fragmentView.setBackgroundColor(getResources().getColor(R.color.dark_blue));
+            // Find the EditText within the fragment's view hierarchy
+            EditText editText = fragmentView.findViewById(
+                    com.google.android.libraries.places.R.id.places_autocomplete_search_input);
 
-                // Find the EditText within the fragment's view hierarchy
-                EditText editText = fragmentView.findViewById(
-                        com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+            if (editText != null) {
+                editText.setTextColor(getResources().getColor(R.color.white));
+                editText.setHintTextColor(getResources().getColor(R.color.white_grey));
+            }
 
-                if (editText != null) {
-                    editText.setTextColor(getResources().getColor(R.color.white));
-                    editText.setHintTextColor(getResources().getColor(R.color.white_grey));
-                }
+            ImageView searchIcon = fragmentView.findViewById(
+                    com.google.android.libraries.places.R.id.places_autocomplete_search_button);
 
-                ImageView searchIcon = fragmentView.findViewById(
-                        com.google.android.libraries.places.R.id.places_autocomplete_search_button);
-
-                if (searchIcon != null) {
-                    // Change the tint of the magnifier icon
-                    searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
-                            PorterDuff.Mode.SRC_IN);
-                }
+            if (searchIcon != null) {
+                // Change the tint of the magnifier icon
+                searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
+                        PorterDuff.Mode.SRC_IN);
             }
         }
 
@@ -176,16 +198,18 @@ public class MainMap extends Fragment {
         });
     }
 
-    /**
-     * Handles the map being ready for interaction.
-     * @param googleMap The GoogleMap instance.
-     */
-    private void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        setupMapUI();
-        setupMapClickListener();
-        addLampLayer();
+    private void showLocationOnMap() {
+        if (googleMap == null) {
+            Log.e("showLocationOnMap", "googleMap is not initialized yet!");
+            return;
+        }
+        LatLng position = new LatLng(xCoord, yCoord);
+        googleMap.addMarker(new MarkerOptions()
+                .position(position)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
+
     /**
      * Adds the Geojson file with street lamps
      */
@@ -193,7 +217,6 @@ public class MainMap extends Fragment {
         // Load the street lamps
         try {
             GeoJsonLayer layer = new GeoJsonLayer(googleMap, R.raw.moabit_lamps, requireContext());
-            //todo: refactor?
             BitmapDescriptor customIcon = BitmapDescriptorFactory.fromResource(R.drawable.lamp);
 
             // Iterate through each feature/point in the geojson layer
@@ -203,6 +226,7 @@ public class MainMap extends Fragment {
                     GeoJsonPointStyle pointStyle = new GeoJsonPointStyle();
                     pointStyle.setIcon(customIcon);
                     feature.setPointStyle(pointStyle);
+                    pointStyle.setAnchor(0.5f, 0.5f);
                 }
             }
             layer.addLayerToMap();
@@ -226,8 +250,8 @@ public class MainMap extends Fragment {
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(currentLatLng)
                         .zIndex(1.0f)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                        .title("Current Location");
+                        .visible(false)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                 currentLocationMarker = googleMap.addMarker(markerOptions);
             } else {
                 // Update the marker's position
@@ -245,13 +269,14 @@ public class MainMap extends Fragment {
         // Enable location features
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.getUiSettings().setCompassEnabled(true);
         } else {
             requestLocationPermission();
         }
 
         // Set listeners for location button and location click events
         googleMap.setOnMyLocationButtonClickListener(() -> {
-            Toast.makeText(getContext(), "My Location button clicked", Toast.LENGTH_SHORT).show();
             return false;
         });
 
@@ -301,7 +326,7 @@ public class MainMap extends Fragment {
             // Build the Directions API request URL
             String url =
                     "https://api.openrouteservice.org/v2/directions/"
-                            + "foot-walking"
+                            + "driving-car"
                             + "?api_key=" + routingApiKey
                             + "&start="
                             + currentLatLng.longitude + ","

@@ -1,19 +1,26 @@
 package com.pia.brighttrip;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 
@@ -46,7 +53,6 @@ public class ExploreFragment extends Fragment {
             database = dbHelper.getDataBase();
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle initialization failure gracefully
             return;
         }
 
@@ -58,6 +64,37 @@ public class ExploreFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MainMap mainMapFragment = new MainMap();
+                Bundle bundle = new Bundle();
+
+                if (dbCursor != null && dbCursor.moveToPosition(position)) {
+                    @SuppressLint("Range") String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
+                    @SuppressLint("Range") Double xcoord = dbCursor.getDouble(dbCursor.getColumnIndex("xcoord"));
+                    @SuppressLint("Range") Double ycoord = dbCursor.getDouble(dbCursor.getColumnIndex("ycoord"));
+                    bundle.putString("name", name);
+                    bundle.putDouble("xcoord", xcoord);
+                    bundle.putDouble("ycoord", ycoord);
+                    mainMapFragment.setArguments(bundle);
+                } else {
+                    Log.e("ExploreFragment", "Cursor is null or unable to move to position: " + position);
+                }
+
+                // Navigate to MainMapFragment
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.rel_layout, mainMapFragment)
+                        .commit();
+
+                // Change bottom navigation color
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.btm_nav);
+                bottomNavigationView.getMenu().findItem(R.id.mainmap).setChecked(true);
+            }
+        });
+
     }
 
     private ArrayAdapter<CharSequence> createAdapterHtml(Cursor cursor) {
@@ -71,13 +108,28 @@ public class ExploreFragment extends Fragment {
         Spanned[] html_array = new Spanned[length];
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
-        double xcoord = cursor.getColumnIndex("xcoord");
-        double ycoord = cursor.getColumnIndex("ycoord");
+        int index_xcoord = cursor.getColumnIndex("xcoord");
+        int index_ycoord = cursor.getColumnIndex("ycoord");
+        //int index_address = cursor.getColumnIndex("address");
+        int index_opens = cursor.getColumnIndex("opens");
+        int index_closes = cursor.getColumnIndex("closes");
 
 
         for (int i = 0; i < length; i++) {
-            html_array[i] = Html.fromHtml(cursor.getString(index_name) + "<br><i>"
-                    + cursor.getString(index_fclass) + "</i><br>" + "{AdressPlaceholder}") ;
+            String name = cursor.getString(index_name).toUpperCase();
+            String fclass = cursor.getString(index_fclass).toUpperCase();
+            String opens = cursor.getString(index_opens).substring(0, 5);
+            String closes = cursor.getString(index_closes).substring(0, 5);
+            //String address = cursor.getString(index_address).toUpperCase();
+
+            //todo: try table
+            String color = "FBD437";
+            html_array[i] = Html.fromHtml(
+                    "<b><span>" + name + "</span></b><br><br>" +
+                            "<i><span>" + fclass + "</span></i><br>" +
+                            "<span>" + "address" + "</span><br><br>" +
+                            "<span style='color:" + color + ";'> open from: " + opens + " to " + closes + "</span>"
+            );
             cursor.moveToNext();
         }
 
