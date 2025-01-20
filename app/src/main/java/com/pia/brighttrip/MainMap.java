@@ -41,6 +41,7 @@ import com.google.android.libraries.places.api.model.Place;
 
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
@@ -68,6 +69,10 @@ public class MainMap extends Fragment {
     private Marker clickMarker;
     private GeoJsonLayer currentGeoJsonLayer;
     private Polyline currentPolyline;
+
+    private Double xCoord;
+    private Double yCoord;
+    private boolean areCoordinatesInitialized = false;
 
     private String googleApiKey = BuildConfig.GOOGLE_API_KEY;
     private String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
@@ -99,16 +104,12 @@ public class MainMap extends Fragment {
 
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
-
         // Retrieve the arguments passed from ExploreFragment
         Bundle args = getArguments();
         if (args != null) {
-            String name = args.getString("name", "Unknown");
-            Double xCoord = args.getDouble("xcoord", 0);
-            Double yCoord = args.getDouble("ycoord", 0);
-            // Call a method to show the location on the map
-            // todo: doesnt work! map is not initialized yet!
-            showLocationOnMap(xCoord, yCoord);
+            xCoord = args.getDouble("xcoord", 0);
+            yCoord = args.getDouble("ycoord", 0);
+            areCoordinatesInitialized = true;
             Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
@@ -123,6 +124,9 @@ public class MainMap extends Fragment {
         this.googleMap = googleMap;
         setupMapUI();
         setupMapClickListener();
+        if (areCoordinatesInitialized) {
+            showLocationOnMap();
+        }
         addLampLayer();
     }
 
@@ -203,7 +207,7 @@ public class MainMap extends Fragment {
         });
     }
 
-    private void showLocationOnMap(Double xCoord, Double yCoord) {
+    private void showLocationOnMap() {
         if (googleMap == null) {
             Log.e("showLocationOnMap", "googleMap is not initialized yet!");
             return;
@@ -212,7 +216,7 @@ public class MainMap extends Fragment {
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
     /**

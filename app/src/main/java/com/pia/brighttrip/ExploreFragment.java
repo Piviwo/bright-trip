@@ -8,6 +8,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -88,8 +89,9 @@ public class ExploreFragment extends Fragment {
                         .replace(R.id.rel_layout, mainMapFragment)
                         .commit();
 
+                // Change bottom navigation color
                 BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.btm_nav);
-                bottomNavigationView.setSelectedItemId(R.id.mainmap);
+                bottomNavigationView.getMenu().findItem(R.id.mainmap).setChecked(true);
             }
         });
 
