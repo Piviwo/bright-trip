@@ -331,7 +331,7 @@ public class MainMap extends Fragment {
             // Build the Directions API request URL
             String url =
                     "https://api.openrouteservice.org/v2/directions/"
-                            + "foot-walking"
+                            + "driving-car"
                             + "?api_key=" + routingApiKey
                             + "&start="
                             + currentLatLng.longitude + ","

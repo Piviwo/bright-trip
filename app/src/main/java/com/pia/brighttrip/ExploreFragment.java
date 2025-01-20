@@ -52,7 +52,6 @@ public class ExploreFragment extends Fragment {
             database = dbHelper.getDataBase();
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle initialization failure gracefully
             return;
         }
 
@@ -75,6 +74,7 @@ public class ExploreFragment extends Fragment {
                     @SuppressLint("Range") String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
                     @SuppressLint("Range") Double xcoord = dbCursor.getDouble(dbCursor.getColumnIndex("xcoord"));
                     @SuppressLint("Range") Double ycoord = dbCursor.getDouble(dbCursor.getColumnIndex("ycoord"));
+                    @SuppressLint("Range") String opens = dbCursor.getString(dbCursor.getColumnIndex("opens"));
                     bundle.putString("name", name);
                     bundle.putDouble("xcoord", xcoord);
                     bundle.putDouble("ycoord", ycoord);
@@ -107,19 +107,24 @@ public class ExploreFragment extends Fragment {
         Spanned[] html_array = new Spanned[length];
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
-        double xcoord = cursor.getColumnIndex("xcoord");
-        double ycoord = cursor.getColumnIndex("ycoord");
+        int xcoord = cursor.getColumnIndex("xcoord");
+        int ycoord = cursor.getColumnIndex("ycoord");
+        int index_opens = cursor.getColumnIndex("opens");
+        int index_closes = cursor.getColumnIndex("closes");
 
 
         for (int i = 0; i < length; i++) {
             String name = cursor.getString(index_name).toUpperCase();
             String fclass = cursor.getString(index_fclass).toUpperCase();
+            String opens = cursor.getString(index_opens);
+            String closes = cursor.getString(index_closes);
 
             //todo: try table
             html_array[i] = Html.fromHtml(
                     "<b><span style='font-size:24sp;'>" + name + "</span></b><br><br>" +
                             "<i><span style='font-size:18sp;'>" + fclass + "</span></i><br>" +
-                            "{AdressPlaceholder}"
+                            "{AdressPlaceholder} <br><br>" +
+                            "<span> Open from: " + opens + " to " + closes + "</span>"
             );
             cursor.moveToNext();
         }
