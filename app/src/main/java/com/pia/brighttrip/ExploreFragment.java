@@ -74,7 +74,6 @@ public class ExploreFragment extends Fragment {
                     @SuppressLint("Range") String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
                     @SuppressLint("Range") Double xcoord = dbCursor.getDouble(dbCursor.getColumnIndex("xcoord"));
                     @SuppressLint("Range") Double ycoord = dbCursor.getDouble(dbCursor.getColumnIndex("ycoord"));
-                    @SuppressLint("Range") String opens = dbCursor.getString(dbCursor.getColumnIndex("opens"));
                     bundle.putString("name", name);
                     bundle.putDouble("xcoord", xcoord);
                     bundle.putDouble("ycoord", ycoord);
@@ -107,8 +106,9 @@ public class ExploreFragment extends Fragment {
         Spanned[] html_array = new Spanned[length];
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
-        int xcoord = cursor.getColumnIndex("xcoord");
-        int ycoord = cursor.getColumnIndex("ycoord");
+        int index_xcoord = cursor.getColumnIndex("xcoord");
+        int index_ycoord = cursor.getColumnIndex("ycoord");
+        int index_address = cursor.getColumnIndex("address");
         int index_opens = cursor.getColumnIndex("opens");
         int index_closes = cursor.getColumnIndex("closes");
 
@@ -121,8 +121,8 @@ public class ExploreFragment extends Fragment {
 
             //todo: try table
             html_array[i] = Html.fromHtml(
-                    "<b><span style='font-size:24sp;'>" + name + "</span></b><br><br>" +
-                            "<i><span style='font-size:18sp;'>" + fclass + "</span></i><br>" +
+                    "<b><span>" + name + "</span></b><br><br>" +
+                            "<i><span>" + fclass + "</span></i><br>" +
                             "{AdressPlaceholder} <br><br>" +
                             "<span> Open from: " + opens + " to " + closes + "</span>"
             );
