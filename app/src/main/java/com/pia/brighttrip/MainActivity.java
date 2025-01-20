@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             fragment = new SupportFragment();
 
         if (item.getItemId() == R.id.about)
-            fragment = new SettingsFragment();
+            fragment = new AboutFragment();
 
         if (fragment != null)
             getSupportFragmentManager().beginTransaction().replace(R.id.rel_layout, fragment).commit();
