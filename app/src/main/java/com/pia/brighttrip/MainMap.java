@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.Manifest;
@@ -162,6 +163,31 @@ public class MainMap extends Fragment {
                 searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
                         PorterDuff.Mode.SRC_IN);
             }
+            ImageButton clearButton = fragmentView.findViewById(
+                    com.google.android.libraries.places.R.id.places_autocomplete_clear_button);
+            clearButton.setColorFilter(getResources().getColor(R.color.white_grey));
+
+            // Overrides the old on click function of the search input
+            clearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(requireContext(), "Search button clicked!", Toast.LENGTH_SHORT).show();
+                    EditText searchField = fragmentView.findViewById(
+                            com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+                    searchField.setText("");
+                    if (currentPolyline != null) {
+                        currentPolyline.remove();
+                    }
+                    if (currentGeoJsonLayer != null) {
+                        currentGeoJsonLayer.removeLayerFromMap();
+                    }
+                    if(clickMarker != null){
+                        clickMarker.remove();
+                    }
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
+
+                }
+            });
         }
 
         // Set up a PlaceSelectionListener to handle the response
