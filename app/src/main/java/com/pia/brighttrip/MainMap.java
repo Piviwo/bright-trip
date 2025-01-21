@@ -99,6 +99,29 @@ public class MainMap extends Fragment {
 
         setUpFindPlaces();
 
+        //Custom map buttons
+        ImageButton btnZoomIn = view.findViewById(R.id.btn_zoom_in);
+        ImageButton btnZoomOut = view.findViewById(R.id.btn_zoom_out);
+        ImageButton btnCurrentLocation = view.findViewById(R.id.btn_current_location);
+
+        btnZoomIn.setOnClickListener(v -> {
+            if (googleMap != null) {
+                googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+
+        btnZoomOut.setOnClickListener(v -> {
+            if (googleMap != null) {
+                googleMap.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+
+        btnCurrentLocation.setOnClickListener(v -> {
+            if (googleMap != null && currentLocationMarker != null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationMarker.getPosition(), INITIAL_ZOOM_LEVEL));
+            }
+        });
+
         // Observe location updates
         locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
         // Retrieve the arguments passed from ExploreFragment
@@ -120,6 +143,16 @@ public class MainMap extends Fragment {
     private void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         setupMapUI();
+
+        // Disable default zoom controls
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+
+        // Disable default my location button
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        // Enable the custom my location button
+        googleMap.setMyLocationEnabled(true);
+
         setupMapClickListener();
         if (areCoordinatesInitialized) {
             showLocationOnMap();

@@ -23,4 +23,48 @@
         android:layout_below="@id/autocomplete_fragment"
         tools:context=".MainMap" />
 
+    <!-- Zoom Buttons -->
+    <LinearLayout
+        android:id="@+id/zoom_buttons_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical"
+        android:layout_margin="16dp">
+
+        <ImageButton
+            android:id="@+id/btn_zoom_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/zoom_in"
+            android:scaleX="1.5"
+            android:scaleY="1.5"/>
+
+        <ImageButton
+            android:id="@+id/btn_zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/zoom_out"
+            android:scaleX="1.5"
+            android:scaleY="1.5"/>
+    </LinearLayout>
+
+    <!-- Current Location Button -->
+    <ImageButton
+        android:id="@+id/btn_current_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/autocomplete_fragment"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/my_location"
+        android:scaleX="1.5"
+        android:scaleY="1.5"/>
 </RelativeLayout>
