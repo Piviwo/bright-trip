@@ -30,7 +30,6 @@ public class SupportFragment extends Fragment {
         // Referencing the ListView in the fragment layout
         ListView listView = view.findViewById(R.id.call_list);
 
-        //todo: add intents
         // List of emergency contacts
         ArrayList<String> contactNames = new ArrayList<>();
         contactNames.add("Police: 110");
@@ -40,7 +39,7 @@ public class SupportFragment extends Fragment {
         // Setting up an ArrayAdapter
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
-                android.R.layout.simple_list_item_1,
+                R.layout.list_item_calls,
                 contactNames
         );
 
