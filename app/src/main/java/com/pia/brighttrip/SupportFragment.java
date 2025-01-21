@@ -33,6 +33,7 @@ public class SupportFragment extends Fragment {
         // List of emergency contacts
         ArrayList<String> contactNames = new ArrayList<>();
         contactNames.add("Police: 110");
+        contactNames.add("Fire Department: 112");
         contactNames.add("Women's Helpline: (030) 610063");
         contactNames.add("Mental Health Helpline: (030) 3906300");
 

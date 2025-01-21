@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -208,7 +207,7 @@ public class MainMap extends Fragment {
                                 .position(selectedLocation)
                                 .zIndex(1.0f)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                    }
+                    } //todo: maybe use amber here
 
                     // Move and animate the camera to the selected place
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));

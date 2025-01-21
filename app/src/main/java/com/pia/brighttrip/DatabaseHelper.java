@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/user/0/";
