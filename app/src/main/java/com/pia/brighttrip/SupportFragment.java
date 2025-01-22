@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class SupportFragment extends Fragment {
 
+    //This fragment is for providing support options for different emergency services
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,11 +32,13 @@ public class SupportFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Finding buttons in the layout
         Button btnPolice = view.findViewById(R.id.btn_police);
         Button btnFire = view.findViewById(R.id.btn_fire);
         Button btnWomen = view.findViewById(R.id.btn_women);
         Button btnMental = view.findViewById(R.id.btn_mental);
 
+        // Setting click listeners for each button to handle user interactions
         btnPolice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +68,7 @@ public class SupportFragment extends Fragment {
         });
     }
 
+    // Opens the dialer for each phone number
     public void callPolice() {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:110"));
