@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+//This fragment displays information about the app
 public class AboutFragment extends Fragment {
 
     @Override
