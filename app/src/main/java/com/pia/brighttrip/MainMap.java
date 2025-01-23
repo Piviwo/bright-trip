@@ -139,12 +139,14 @@ public class MainMap extends Fragment {
      */
     private void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+
         setupMapUI();
 
         setupMapClickListener();
         if (areCoordinatesInitialized) {
             showLocationOnMap();
         }
+
         addLampLayer();
     }
 
