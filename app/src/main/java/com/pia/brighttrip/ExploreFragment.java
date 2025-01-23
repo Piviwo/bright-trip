@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -150,14 +151,15 @@ public class ExploreFragment extends Fragment {
                 Log.e("AMENITY_STATUS", "Error parsing time", e);
             }
 
-            //todo: try table
-            String color = "FBD437";
-            html_array[i] = Html.fromHtml(
-                    "<b><span>" + name + "</span></b><br><br>" +
+            String color = status.equals("open") ? "#FBD437" : "#F94124";
+            String openText = status.equals("open") ? " from: " : " - open from: ";
+                    html_array[i] = HtmlCompat.fromHtml(
+                    "<big><span style='color: #FFBF00;'>" + name + "</span></big><br><br>" +
                             "<i><span>" + fclass + "</span></i><br>" +
                             "<span>" + "address" + "</span><br><br>" +
-                            "<span>" + status + "</span><br>" +
-                            "<span style='color:" + color + ";'> open from: " + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>"
+                            "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
+                            "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
             );
             cursor.moveToNext();
         }

@@ -130,7 +130,7 @@ public class MainMap extends Fragment {
             xCoord = args.getDouble("xcoord", 0);
             yCoord = args.getDouble("ycoord", 0);
             areCoordinatesInitialized = true;
-            Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
         }
@@ -261,7 +261,7 @@ public class MainMap extends Fragment {
             Log.e("showLocationOnMap", "googleMap is not initialized yet!");
             return;
         }
-        LatLng position = new LatLng(xCoord, yCoord);
+        LatLng position = new LatLng(yCoord,xCoord);
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
