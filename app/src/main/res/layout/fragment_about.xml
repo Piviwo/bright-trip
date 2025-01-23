@@ -8,34 +8,28 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- FrameLayout to allow title on top of image -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="230dp">
 
-        <!-- Team Photo -->
-        <ImageView
-            android:id="@+id/team_photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/team_photo"
-            android:contentDescription="Team photo" />
+        <!-- Title -->
+    <TextView
+        android:id="@+id/about_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="About the App"
+        android:textColor="@color/yellow"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="6dp"/>
 
-        <!-- Title (About the App) placed on top of the image -->
-        <TextView
-            android:id="@+id/about_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="About the App"
-            android:textColor="@color/base_map_main"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_gravity="top|start"
-            android:layout_marginTop="6dp"
-            android:layout_marginStart="6dp"/>
-
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/berlin_girl"
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Illustration"
+        android:src="@drawable/berlin_girl" />
 
     <!-- Welcome Text below Image (Below the Team Photo) -->
     <TextView
@@ -45,29 +39,41 @@
         android:text="Welcome to BrightTrip, your trusted companion for safe night commutes!"
         android:textColor="@color/yellow"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:lineSpacingExtra="4dp"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp"/>
 
     <!-- More Info Text (Further Details) below the Welcome Text -->
     <TextView
         android:id="@+id/about_more_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/yellow"
-        android:text="BrightTrip was created by Pia Wolffram and Tanya Pozdnyakova, students of the M.Sc. Cartography program. Driven by a shared passion for enhancing community safety, we aimed to design a practical, user-friendly app that helps individuals to commute confidently during late-night hours. Leveraging our skills in cartography, design, and development, we worked together to bring this app to life. Whether you're a resident or a visitor, BrightTrip is here to ensure you feel secure and informed every step of the way."
-        android:textSize="18sp"
+        android:textColor="@color/app_text"
+        android:text="This app was created by Pia Wolffram and Tanya Pozdnyakova. Driven by a shared passion for enhancing community safety, we aimed to design a user-friendly app that can help you commute confidently during late-night hours. Whether you're a resident or a visitor, BrightTrip is here to ensure you feel secure and informed every step of the way."
+        android:textSize="16sp"
         android:lineSpacingExtra="6dp"
         android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="6dp" />
+
+    <TextView
+        android:id="@+id/stay_safe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/app_text"
+        android:text="Stay safe!"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:textSize="22sp"
+        android:lineSpacingExtra="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp" />
 
     <!-- Heart Icon centered horizontally below the Text Content -->
     <ImageView
         android:id="@+id/heart_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
         android:contentDescription="Heart icon"
         android:src="@drawable/heart" />
 

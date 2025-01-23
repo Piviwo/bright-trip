@@ -6,35 +6,36 @@
     android:layout_height="match_parent"
     android:background="@color/app_background"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="24dp"
+        android:layout_margin="10dp"
         android:elevation="4dp"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="10dp">
 
         <!-- Heading -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="15dp"
             android:text="Do you feel unsafe?"
             android:textColor="@color/yellow"
-            android:textSize="25sp"
+            android:textSize="28sp"
             android:textStyle="bold" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="15dp"
             android:text="Here is what you can do:"
-            android:textColor="@color/yellow"
-            android:textSize="20sp" />
+            android:textStyle="bold"
+            android:textColor="@color/app_text"
+            android:textSize="22sp" />
 
         <!-- List of Actions -->
         <LinearLayout
@@ -61,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:text="Move to a well-lit area"
                     android:layout_marginLeft="8dp"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/app_text"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -84,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:text="Find a crowded place"
                     android:layout_marginLeft="8dp"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/app_text"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -107,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:text="Call for help if needed"
                     android:layout_marginLeft="8dp"
-                    android:textColor="@color/yellow"
+                    android:textColor="@color/app_text"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -117,21 +118,60 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="16dp"
             android:drawablePadding="4dp"
             android:gravity="center"
-            android:text="Berlin Emergency Numbers Box"
-            android:textColor="@color/yellow"
+            android:text="Berlin Emergency Numbers:"
+            android:textColor="@color/app_text"
             android:textStyle="bold"
-            android:textSize="20sp" />
+            android:textSize="22sp" />
 
-        <ListView
-            android:id="@+id/call_list"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@color/nav_bar_buttons"
-            android:dividerHeight="1dp" />
+            android:orientation="vertical">
 
+            <Button
+                android:id="@+id/btn_police"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/yellow"
+                android:text="Police: 110"
+                android:textSize="20sp"
+                android:textColor="@color/app_background" />
+
+            <Button
+                android:id="@+id/btn_fire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/yellow"
+                android:text="Fire Department: 112"
+                android:textSize="20sp"
+                android:textColor="@color/app_background" />
+
+            <Button
+                android:id="@+id/btn_women"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/yellow"
+                android:text="Women's Helpline: (030)610063"
+                android:textSize="20sp"
+                android:textColor="@color/app_background" />
+
+            <Button
+                android:id="@+id/btn_mental"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/yellow"
+                android:text="Mental Health Helpline: (030)3906300"
+                android:textSize="20sp"
+                android:textColor="@color/app_background" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
