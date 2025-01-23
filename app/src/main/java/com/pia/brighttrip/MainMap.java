@@ -105,14 +105,14 @@ public class MainMap extends Fragment {
         }
 
         // Get the last known location and move the camera
-        fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(requireActivity(), location -> {
-                if (location != null) {
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                } else {
-                    Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
-                }
-            });
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            } else {
+                Toast.makeText(requireContext(), "Unable to fetch location", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Set up the map
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -242,7 +242,9 @@ public class MainMap extends Fragment {
         });
     }
 
-
+    /**
+     * Shows the location from the Explore Page on map
+     */
     private void showLocationOnMap() {
         if (googleMap == null) {
             Log.e("showLocationOnMap", "googleMap is not initialized yet!");
@@ -253,7 +255,8 @@ public class MainMap extends Fragment {
             .position(position)
             .zIndex(1.0f)
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        Log.d("showLocationOnMap", "position" + position.toString());
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
     }
 
     /**
@@ -283,6 +286,9 @@ public class MainMap extends Fragment {
         }
     }
 
+    /**
+     * Sets up map UI settings
+     */
     private void setupMapUI() {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
