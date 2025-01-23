@@ -21,6 +21,10 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ExploreFragment extends Fragment {
 
@@ -116,9 +120,35 @@ public class ExploreFragment extends Fragment {
         for (int i = 0; i < length; i++) {
             String name = cursor.getString(index_name).toUpperCase();
             String fclass = cursor.getString(index_fclass).toUpperCase();
-            String opens = cursor.getString(index_opens).substring(0, 5);
-            String closes = cursor.getString(index_closes).substring(0, 5);
+            String opens = cursor.getString(index_opens);
+            String closes = cursor.getString(index_closes);
+            String status = "status not available";
             //String address = cursor.getString(index_address).toUpperCase();
+
+            try {
+                // Define input format for opens and closes times
+                DateFormat inputFormat = new SimpleDateFormat("HH:mm:ss");
+
+                // Parse the "opens" and "closes" times
+                Date openTime = inputFormat.parse(opens);
+                Date closeTime = inputFormat.parse(closes);
+
+                // Get the current time of the device
+                Date currentTime = new Date();
+                DateFormat currentTimeFormat = new SimpleDateFormat("HH:mm:ss");
+                String currentTimeString = currentTimeFormat.format(currentTime);
+                currentTime = inputFormat.parse(currentTimeString);
+
+                // Determine if the amenity is open or closed
+                if (currentTime.after(openTime) && currentTime.before(closeTime)) {
+                    status = "open";
+                } else {
+                    status = "closed";
+                }
+
+            } catch (ParseException e) {
+                Log.e("AMENITY_STATUS", "Error parsing time", e);
+            }
 
             //todo: try table
             String color = "FBD437";
@@ -126,7 +156,8 @@ public class ExploreFragment extends Fragment {
                     "<b><span>" + name + "</span></b><br><br>" +
                             "<i><span>" + fclass + "</span></i><br>" +
                             "<span>" + "address" + "</span><br><br>" +
-                            "<span style='color:" + color + ";'> open from: " + opens + " to " + closes + "</span>"
+                            "<span>" + status + "</span><br>" +
+                            "<span style='color:" + color + ";'> open from: " + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>"
             );
             cursor.moveToNext();
         }
