@@ -2,9 +2,9 @@ package com.pia.brighttrip;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
@@ -22,14 +22,11 @@ import android.widget.Toast;
 import android.Manifest;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -57,7 +54,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
-import android.location.Location;
 
 
 public class MainMap extends Fragment {
@@ -66,9 +62,11 @@ public class MainMap extends Fragment {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private GoogleMap googleMap;
+    private Marker currentLocationMarker;
     private Marker clickMarker;
     private GeoJsonLayer currentGeoJsonLayer;
     private Polyline currentPolyline;
+
     private Double xCoord;
     private Double yCoord;
     private boolean areCoordinatesInitialized = false;
@@ -76,7 +74,7 @@ public class MainMap extends Fragment {
     private final String googleApiKey = BuildConfig.GOOGLE_API_KEY;
     private final String routingApiKey = BuildConfig.OPEN_ROUTE_API_KEY;
 
-    private FusedLocationProviderClient fusedLocationClient;
+    private LocationViewModel locationViewModel;
 
     @Nullable
     @Override
@@ -89,30 +87,9 @@ public class MainMap extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Initialize FusedLocationProviderClient
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        // Check permissions and request location
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Request permission if not granted
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
-
-        // Get the last known location and move the camera
-        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            } else {
-                Toast.makeText(requireContext(), "Unable to fetch location", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Initialize the LocationViewModel
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
 
         // Set up the map
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -122,14 +99,40 @@ public class MainMap extends Fragment {
 
         setUpFindPlaces();
 
+        //Custom map buttons
+        ImageButton btnZoomIn = view.findViewById(R.id.btn_zoom_in);
+        ImageButton btnZoomOut = view.findViewById(R.id.btn_zoom_out);
+        ImageButton btnCurrentLocation = view.findViewById(R.id.btn_current_location);
+
+        btnZoomIn.setOnClickListener(v -> {
+            if (googleMap != null) {
+                googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+
+        btnZoomOut.setOnClickListener(v -> {
+            if (googleMap != null) {
+                googleMap.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+
+        btnCurrentLocation.setOnClickListener(v -> {
+            if (googleMap != null && currentLocationMarker != null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationMarker.getPosition(), INITIAL_ZOOM_LEVEL));
+            }
+        });
+
+        // Observe location updates
+        locationViewModel.getLocation().observe(getViewLifecycleOwner(), this::updateCurrentLocation);
         // Retrieve the arguments passed from ExploreFragment
         Bundle args = getArguments();
         if (args != null) {
             xCoord = args.getDouble("xcoord", 0);
             yCoord = args.getDouble("ycoord", 0);
             areCoordinatesInitialized = true;
+            Toast.makeText(getContext(), xCoord.toString(), Toast.LENGTH_SHORT).show();
         } else {
-            //Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -139,14 +142,21 @@ public class MainMap extends Fragment {
      */
     private void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-
         setupMapUI();
+
+        // Disable default zoom controls
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+
+        // Disable default my location button
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        // Enable the custom my location button
+        googleMap.setMyLocationEnabled(true);
 
         setupMapClickListener();
         if (areCoordinatesInitialized) {
             showLocationOnMap();
         }
-
         addLampLayer();
     }
 
@@ -193,7 +203,7 @@ public class MainMap extends Fragment {
             clearButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(requireContext(), "Search button clicked!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Search button clicked!", Toast.LENGTH_SHORT).show();
                     EditText searchField = fragmentView.findViewById(
                             com.google.android.libraries.places.R.id.places_autocomplete_search_input);
                     searchField.setText("");
@@ -217,8 +227,10 @@ public class MainMap extends Fragment {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
 
+                // Get the LatLng of the selected place
                 LatLng selectedLocation = place.getLatLng();
 
+                // Check if LatLng is not null
                 if (selectedLocation != null) {
                     // Remove the previous marker if it exists
                     if (clickMarker != null) {
@@ -230,7 +242,7 @@ public class MainMap extends Fragment {
                                 .zIndex(1.0f)
                                 .icon(customMarker));
                                 //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                    }
+                    } //todo: maybe use amber here
 
                     // Move and animate the camera to the selected place
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));
@@ -246,22 +258,18 @@ public class MainMap extends Fragment {
         });
     }
 
-    /**
-     * Shows the location from the Explore Page on map
-     */
     private void showLocationOnMap() {
         if (googleMap == null) {
             Log.e("showLocationOnMap", "googleMap is not initialized yet!");
             return;
         }
-        LatLng position = new LatLng(yCoord,xCoord);
+        LatLng position = new LatLng(xCoord, yCoord);
         BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.azure_marker);
         googleMap.addMarker(new MarkerOptions()
                 .position(position)
-                .zIndex(1.0f)
                 .icon(customMarker));
-        Log.d("showLocationOnMap", "position" + position.toString());
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
+                //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
     /**
@@ -292,78 +300,65 @@ public class MainMap extends Fragment {
     }
 
     /**
-     * Sets up map UI settings
+     * Updates the current location marker on the map.
+     * @param location The new location.
      */
+    private void updateCurrentLocation(Location location) {
+        if (location != null && googleMap != null) {
+            LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            if (currentLocationMarker == null) {
+                // Add a new marker for the current location
+                BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.azure_marker);
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(currentLatLng)
+                        .zIndex(1.0f)
+                        .visible(false)
+                        .icon(customMarker);
+                        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                currentLocationMarker = googleMap.addMarker(markerOptions);
+            } else {
+                // Update the marker's position
+            }
+        }
+    }
+
     private void setupMapUI() {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
-        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.getUiSettings().setCompassEnabled(false);
 
         // Enable location features
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.getUiSettings().setCompassEnabled(true);
         } else {
-            //onRequestPermissionsResult();
+            requestLocationPermission();
         }
 
-        //Custom map buttons
-        ImageButton btnZoomIn = getView().findViewById(R.id.btn_zoom_in);
-        ImageButton btnZoomOut = getView().findViewById(R.id.btn_zoom_out);
-        ImageButton btnCurrentLocation = getView().findViewById(R.id.btn_current_location);
-
-        btnZoomIn.setOnClickListener(v -> {
-            if (googleMap != null) {
-                googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-            }
+        // Set listeners for location button and location click events
+        googleMap.setOnMyLocationButtonClickListener(() -> {
+            return false;
         });
 
-        btnZoomOut.setOnClickListener(v -> {
-            if (googleMap != null) {
-                googleMap.animateCamera(CameraUpdateFactory.zoomOut());
-            }
-        });
-
-        btnCurrentLocation.setOnClickListener(v -> {
-            // Get the last known location from FusedLocationProviderClient
-            fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-                if (location != null) {
-                    // Get the latitude and longitude from the Location object
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    LatLng userLocation = new LatLng(latitude, longitude);
-
-                    // Create a CameraPosition with the user's location
-                    CameraPosition camPos = new CameraPosition.Builder()
-                            .target(userLocation)
-                            .zoom(15)
-                            .bearing(25)
-                            .build();
-
-                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPos));
-
-                } else {
-                    Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
-                }
-            });
+        googleMap.setOnMyLocationClickListener(location -> {
+            Toast.makeText(getContext(), "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, enable the current location button functionality
-                setupMapUI(); // Ensure the UI gets updated to show location
-            } else {
-                // Permission denied, handle the case
-                Toast.makeText(requireContext(), "Location permission is required", Toast.LENGTH_SHORT).show();
-            }
+    /**
+     * Function to request location permission if not set
+     */
+    private void requestLocationPermission() {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Show an explanation to the user asynchronously
+            Toast.makeText(getContext(), "Location permission is required to use this feature.", Toast.LENGTH_SHORT).show();
         }
+        // Request the permission
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
     }
 
     /**
@@ -380,6 +375,8 @@ public class MainMap extends Fragment {
                     .zIndex(1.0f)
                     .position(newPos)
                     .icon(customMarker));
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+
             drawRouteTo(newPos);
         });
     }
@@ -388,36 +385,29 @@ public class MainMap extends Fragment {
      * Draws a polyline between the current location and the specified position.
      */
     private void drawRouteTo(LatLng destination) {
-        fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(requireActivity(), location -> {
-                if (location != null && googleMap != null) {
-                    // Build the Directions API request URL
-                    String url =
-                        "https://api.openrouteservice.org/v2/directions/"
-                                + "driving-car"
-                                + "?api_key=" + routingApiKey
-                                + "&start="
-                                + location.getLongitude() + ","
-                                + location.getLatitude() + ","
-                                + "&end="
-                                + clickMarker.getPosition().longitude + ","
-                                + clickMarker.getPosition().latitude;
-                    new DownloadGeoJsonFile(location).execute(url);
-                } else {
-                    Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (currentLocationMarker != null && googleMap != null) {
+            // Get the current location marker's position
+            LatLng currentLatLng = currentLocationMarker.getPosition();
+
+            // Build the Directions API request URL
+            String url =
+                    "https://api.openrouteservice.org/v2/directions/"
+                            + "driving-car"
+                            + "?api_key=" + routingApiKey
+                            + "&start="
+                            + currentLatLng.longitude + ","
+                            + currentLatLng.latitude
+                            + "&end="
+                            + clickMarker.getPosition().longitude + ","
+                            + clickMarker.getPosition().latitude;
+            new DownloadGeoJsonFile().execute(url);
+        }
     }
 
     /**
      * Downloads the geojson file of the route between to locations
      */
     private class DownloadGeoJsonFile extends AsyncTask<String, Void, GeoJsonLayer> {
-
-        private Location location;
-        public DownloadGeoJsonFile(Location location) {
-            this.location = location;
-        }
 
         @Override
         protected GeoJsonLayer doInBackground(String... params) {
@@ -469,7 +459,7 @@ public class MainMap extends Fragment {
                 currentGeoJsonLayer = layer;
             } else {
                 currentPolyline = googleMap.addPolyline(new PolylineOptions()
-                        .add(new LatLng(location.getLatitude(), location.getLongitude()), clickMarker.getPosition())
+                        .add(currentLocationMarker.getPosition(), clickMarker.getPosition())
                         .width(8)
                         .color(ContextCompat.getColor(requireContext(), R.color.route_color))
                         .zIndex(1.0f)
@@ -478,7 +468,7 @@ public class MainMap extends Fragment {
 
             // Create LatLngBounds.Builder to include both marker positions
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(new LatLng(location.getLatitude(), location.getLongitude()));
+            builder.include(currentLocationMarker.getPosition());
             builder.include(clickMarker.getPosition());
             LatLngBounds bounds = builder.build();
             googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
