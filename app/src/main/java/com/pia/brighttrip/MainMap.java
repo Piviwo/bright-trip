@@ -380,8 +380,6 @@ public class MainMap extends Fragment {
                     .zIndex(1.0f)
                     .position(newPos)
                     .icon(customMarker));
-                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-
             drawRouteTo(newPos);
         });
     }
