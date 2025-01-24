@@ -89,6 +89,8 @@ public class MainMap extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("Lifecycle", "onViewCreated called");
+
         // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
@@ -117,7 +119,10 @@ public class MainMap extends Fragment {
         // Set up the map
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
+            Log.d("Lifecycle", "Requesting map async initialization");
             mapFragment.getMapAsync(this::onMapReady);
+        } else {
+            Log.e("Lifecycle", "Map fragment is null!");
         }
 
         setUpFindPlaces();
@@ -138,15 +143,13 @@ public class MainMap extends Fragment {
      * @param googleMap The GoogleMap instance.
      */
     private void onMapReady(GoogleMap googleMap) {
+        Log.d("Lifecycle", "onMapReady called");
         this.googleMap = googleMap;
-
         setupMapUI();
-
         setupMapClickListener();
         if (areCoordinatesInitialized) {
             showLocationOnMap();
         }
-
         addLampLayer();
     }
 

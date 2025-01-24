@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -120,7 +119,7 @@ public class ExploreFragment extends Fragment {
 
         for (int i = 0; i < length; i++) {
             String name = cursor.getString(index_name).toUpperCase();
-            String fclass = cursor.getString(index_fclass).toUpperCase();
+            String fclass = cursor.getString(index_fclass).toLowerCase().replace("_", " ");
             String opens = cursor.getString(index_opens);
             String closes = cursor.getString(index_closes);
             String status = "status not available";
@@ -154,8 +153,8 @@ public class ExploreFragment extends Fragment {
             String color = status.equals("open") ? "#FBD437" : "#F94124";
             String openText = status.equals("open") ? " from: " : " - open from: ";
                     html_array[i] = HtmlCompat.fromHtml(
-                    "<big><span style='color: #FFBF00;'>" + name + "</span></big><br><br>" +
-                            "<i><span>" + fclass + "</span></i><br>" +
+                    "<big><span style='color: #FFBF00;'>" + name + "</span></big><small><br><br></small>" +
+                            "<span>" + fclass + "</span><br>" +
                             "<span>" + "address" + "</span><br><br>" +
                             "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
                             "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
