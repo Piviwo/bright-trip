@@ -224,10 +224,11 @@ public class MainMap extends Fragment {
                     if (clickMarker != null) {
                         clickMarker.setPosition(selectedLocation);
                     } else {
+                        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.yellow_marker);
                         clickMarker = googleMap.addMarker(new MarkerOptions()
                                 .position(selectedLocation)
                                 .zIndex(1.0f)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                                .icon(customMarker));
                     }
 
                     // Move and animate the camera to the selected place
@@ -253,10 +254,11 @@ public class MainMap extends Fragment {
             return;
         }
         LatLng position = new LatLng(yCoord,xCoord);
+        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.azure_marker);
         googleMap.addMarker(new MarkerOptions()
             .position(position)
             .zIndex(1.0f)
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            .icon(customMarker));
         Log.d("showLocationOnMap", "position" + position.toString());
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
     }
@@ -372,10 +374,11 @@ public class MainMap extends Fragment {
                 //remove previous markers
                 clickMarker.remove();
             }
+            BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.yellow_marker);
             clickMarker = googleMap.addMarker(new MarkerOptions()
                     .zIndex(1.0f)
                     .position(newPos)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                    .icon(customMarker));
 
             drawRouteTo(newPos);
         });
