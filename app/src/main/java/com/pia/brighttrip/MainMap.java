@@ -89,6 +89,19 @@ public class MainMap extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("Lifecycle", "onViewCreated called");
+
+        // Set up the map
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            Log.d("Lifecycle", "Requesting map async initialization");
+            mapFragment.getMapAsync(this::onMapReady);
+        } else {
+            Log.e("Lifecycle", "Map fragment is null!");
+        }
+
+        setUpFindPlaces();
+
         // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
@@ -104,24 +117,6 @@ public class MainMap extends Fragment {
             return;
         }
 
-        // Get the last known location and move the camera
-        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            } else {
-                Toast.makeText(requireContext(), "Unable to fetch location", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Set up the map
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this::onMapReady);
-        }
-
-        setUpFindPlaces();
-
         // Retrieve the arguments passed from ExploreFragment
         Bundle args = getArguments();
         if (args != null) {
@@ -131,6 +126,16 @@ public class MainMap extends Fragment {
         } else {
             //Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
         }
+
+        // Get the last known location and move the camera
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                Log.d("Lifecycle", "Location Client ready");
+            } else {
+                Toast.makeText(requireContext(), "Unable to fetch location", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -138,15 +143,13 @@ public class MainMap extends Fragment {
      * @param googleMap The GoogleMap instance.
      */
     private void onMapReady(GoogleMap googleMap) {
+        Log.d("Lifecycle", "onMapReady called");
         this.googleMap = googleMap;
-
         setupMapUI();
-
         setupMapClickListener();
         if (areCoordinatesInitialized) {
             showLocationOnMap();
         }
-
         addLampLayer();
     }
 
