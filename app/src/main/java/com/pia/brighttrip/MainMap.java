@@ -71,6 +71,7 @@ public class MainMap extends Fragment {
     private Polyline currentPolyline;
     private Double xCoord;
     private Double yCoord;
+    private String fclass;
     private boolean areCoordinatesInitialized = false;
 
     private final String googleApiKey = BuildConfig.GOOGLE_API_KEY;
@@ -122,6 +123,7 @@ public class MainMap extends Fragment {
         if (args != null) {
             xCoord = args.getDouble("xcoord", 0);
             yCoord = args.getDouble("ycoord", 0);
+            fclass = args.getString("fclass", "");
             areCoordinatesInitialized = true;
         } else {
             //Toast.makeText(getContext(), "No data received!", Toast.LENGTH_SHORT).show();
@@ -257,13 +259,37 @@ public class MainMap extends Fragment {
             return;
         }
         LatLng position = new LatLng(yCoord,xCoord);
-        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.azure_marker);
+
+        int markerResource = getMarkerResource(fclass);
+        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(markerResource);
+
         googleMap.addMarker(new MarkerOptions()
             .position(position)
             .zIndex(1.0f)
             .icon(customMarker));
         Log.d("showLocationOnMap", "position" + position.toString());
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
+    }
+
+    // Method to get the appropriate marker drawable resource based on fclass
+    private int getMarkerResource(String fclass) {
+        switch (fclass) {
+            case "bar":
+            case "restaurant":
+                return R.drawable.azure_marker;
+            case "cafe":
+                return R.drawable.yellow_marker;
+            case "kiosk":
+                return R.drawable.yellow_marker;
+            case "fast_food":
+                return R.drawable.yellow_marker;
+            case "fire":
+                return R.drawable.yellow_marker;
+            case "hotel":
+                return R.drawable.yellow_marker;
+            default:
+                return R.drawable.yellow_marker;
+        }
     }
 
     /**
