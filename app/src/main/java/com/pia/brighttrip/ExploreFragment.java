@@ -82,9 +82,11 @@ public class ExploreFragment extends Fragment {
                     @SuppressLint("Range") String name = dbCursor.getString(dbCursor.getColumnIndex("name"));
                     @SuppressLint("Range") Double xcoord = dbCursor.getDouble(dbCursor.getColumnIndex("xcoord"));
                     @SuppressLint("Range") Double ycoord = dbCursor.getDouble(dbCursor.getColumnIndex("ycoord"));
+                    @SuppressLint("Range") String fclass = dbCursor.getString(dbCursor.getColumnIndex("fclass"));
                     bundle.putString("name", name);
                     bundle.putDouble("xcoord", xcoord);
                     bundle.putDouble("ycoord", ycoord);
+                    bundle.putString("fclass", fclass);
                     mainMapFragment.setArguments(bundle);
                 } else {
                     Log.e("ExploreFragment", "Cursor is null or unable to move to position: " + position);
