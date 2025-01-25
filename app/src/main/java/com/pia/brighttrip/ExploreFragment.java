@@ -3,6 +3,8 @@ package com.pia.brighttrip;
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.util.Log;
@@ -25,6 +27,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class ExploreFragment extends Fragment {
 
@@ -60,7 +63,9 @@ public class ExploreFragment extends Fragment {
 
         // Query the database
         try {
-            dbCursor = database.rawQuery("SELECT * FROM pois_moabit WHERE name IS NOT NULL;", null);
+            dbCursor = database.rawQuery(
+                    "SELECT * FROM pois_moabit WHERE name IS NOT NULL AND fclass " +
+                            "IN ('cafe', 'restaurant', 'bar', 'fire_station', 'hotel', 'police', 'pub', 'kiosk', 'fast_food');", null);
             ArrayAdapter<CharSequence> adapter = createAdapterHtml(dbCursor);
             list_view.setAdapter(adapter);
         } catch (Exception e) {
@@ -108,11 +113,12 @@ public class ExploreFragment extends Fragment {
         int length = cursor.getCount();
         cursor.moveToFirst();
         Spanned[] html_array = new Spanned[length];
+        Geocoder geocoder = new Geocoder(requireContext());
+
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
         int index_xcoord = cursor.getColumnIndex("xcoord");
         int index_ycoord = cursor.getColumnIndex("ycoord");
-        //int index_address = cursor.getColumnIndex("address");
         int index_opens = cursor.getColumnIndex("opens");
         int index_closes = cursor.getColumnIndex("closes");
 
@@ -123,7 +129,29 @@ public class ExploreFragment extends Fragment {
             String opens = cursor.getString(index_opens);
             String closes = cursor.getString(index_closes);
             String status = "status not available";
-            //String address = cursor.getString(index_address).toUpperCase();
+            double xcoord = cursor.getDouble(index_xcoord);
+            double ycoord = cursor.getDouble(index_ycoord);
+
+            // Use the Geocoder to fetch the address for the coordinates
+            String address = "";
+            if (i < 10) { // Geocode only the first 10 items to safe limit and loading times
+                try {
+                    // Use the Geocoder to fetch the address for the coordinates
+                    List<Address> addresses = geocoder.getFromLocation(ycoord, xcoord, 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        Address addr = addresses.get(0);
+                        address = addr.getAddressLine(0);
+                    } else {
+                        address = "Address not found";
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    address = "Geocoding error";
+                }
+            } else {
+                // Skip geocoding for indices beyond the first 10
+                address = "Geocoding skipped";
+            }
 
             try {
                 // Define input format for opens and closes times
@@ -155,7 +183,7 @@ public class ExploreFragment extends Fragment {
                     html_array[i] = HtmlCompat.fromHtml(
                     "<big><span style='color: #FFD800;'>" + name + "</span></big><small><br></small>" +
                             "<small><span>" + fclass + "</span><br><br></small>" +
-                            "<span>" + "address" + "</span><br><br>" +
+                            "<span>" + address + "</span><br><br>" +
                             "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
                             "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
                     HtmlCompat.FROM_HTML_MODE_LEGACY
