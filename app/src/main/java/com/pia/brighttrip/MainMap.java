@@ -262,18 +262,21 @@ public class MainMap extends Fragment {
     private int getMarkerResource(String fclass) {
         switch (fclass) {
             case "bar":
+                return R.drawable.bar_marker;
             case "restaurant":
-                return R.drawable.azure_marker;
+                return R.drawable.restaurant_marker;
             case "cafe":
-                return R.drawable.yellow_marker;
+                return R.drawable.cafe_marker;
             case "kiosk":
-                return R.drawable.yellow_marker;
+                return R.drawable.kiosk_marker;
             case "fast_food":
-                return R.drawable.yellow_marker;
+                return R.drawable.fast_food_marker;
             case "fire":
-                return R.drawable.yellow_marker;
+                return R.drawable.fire_marker;
+            case "police":
+                return R.drawable.police_marker;
             case "hotel":
-                return R.drawable.yellow_marker;
+                return R.drawable.hotel_marker;
             default:
                 return R.drawable.yellow_marker;
         }
