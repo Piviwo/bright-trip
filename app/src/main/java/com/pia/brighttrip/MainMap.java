@@ -2,7 +2,6 @@ package com.pia.brighttrip;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -92,7 +91,7 @@ public class MainMap extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d("Lifecycle", "onViewCreated called");
 
-        // Set up the map
+        // Set up the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             Log.d("Lifecycle", "Requesting map async initialization");
@@ -105,18 +104,6 @@ public class MainMap extends Fragment {
 
         // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
-        // Check permissions and request location
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Request permission if not granted
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
 
         // Retrieve the arguments passed from ExploreFragment
         Bundle args = getArguments();

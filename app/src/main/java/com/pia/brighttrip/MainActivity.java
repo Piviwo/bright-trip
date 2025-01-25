@@ -34,10 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize ViewModel
-        locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
-
-        // Initialize Bottom Navigation View
+        // Initialize Bottom Navigation View and set Listener
         bottomNavigationView = findViewById(R.id.btm_nav);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -46,17 +43,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.rel_layout, new MainMap()).commit();
-
         // Initialize Location Manager and Listener
+        getSupportFragmentManager().beginTransaction().replace(R.id.rel_layout, new MainMap()).commit();
+        locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (location != null) {
-                    //Toast.makeText(MainActivity.this, "Location: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-
-                    //share location with view model
                     locationViewModel.setLocation(location);
                 }
             }
@@ -75,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     if (fineLocationGranted != null && fineLocationGranted) {
-                        // Request updates from GPS
                         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // Todo: write Toast
+                            Toast.makeText(this, "Location permissions are required to use this feature.", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         locationManager.requestLocationUpdates(
@@ -110,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         locationPermissionRequest.launch(PERMISSIONS);
     }
 
+    // Handles the navigation selection of the bottom navigation bar
     private boolean handleNavigationSelection(@NonNull MenuItem item) {
         Fragment fragment = null;
 
