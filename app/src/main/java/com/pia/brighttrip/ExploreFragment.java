@@ -134,22 +134,30 @@ public class ExploreFragment extends Fragment {
 
             // Use the Geocoder to fetch the address for the coordinates
             String address = "";
-            if (i < 10) { // Geocode only the first 10 items to safe limit and loading times
+            if (i < 10) { // Geocode only the first 10 items
                 try {
-                    // Use the Geocoder to fetch the address for the coordinates
                     List<Address> addresses = geocoder.getFromLocation(ycoord, xcoord, 1);
                     if (addresses != null && !addresses.isEmpty()) {
                         Address addr = addresses.get(0);
-                        address = addr.getAddressLine(0);
+
+                        // Extract only specific components of the address
+                        String street = addr.getThoroughfare();
+                        String streetNumber = addr.getSubThoroughfare();
+                        String postalCode = addr.getPostalCode();
+                        String city = addr.getLocality();
+
+                        // Build address string
+                        address = (streetNumber != null ? streetNumber + " " : "") +
+                                (street != null ? street + ", " : "") +
+                                (postalCode != null ? postalCode + " " : "") +
+                                (city != null ? city : "");
                     } else {
                         address = "Address not found";
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
                     address = "Geocoding error";
                 }
             } else {
-                // Skip geocoding for indices beyond the first 10
                 address = "Geocoding skipped";
             }
 
@@ -179,11 +187,11 @@ public class ExploreFragment extends Fragment {
             }
 
             String color = status.equals("open") ? "#FBD437" : "#F94124";
-            String openText = status.equals("open") ? " from: " : " - open from: ";
+            String openText = status.equals("open") ? " - from: " : " - open from: ";
                     html_array[i] = HtmlCompat.fromHtml(
                     "<big><span style='color: #FFD800;'>" + name + "</span></big><small><br></small>" +
-                            "<small><span>" + fclass + "</span><br><br></small>" +
                             "<span>" + address + "</span><br><br>" +
+                            //"<small><span>" + fclass + "</span><br><br></small>" +
                             "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
                             "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
                     HtmlCompat.FROM_HTML_MODE_LEGACY
