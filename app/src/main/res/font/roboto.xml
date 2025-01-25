@@ -3,7 +3,7 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="700"
-        android:font="@font/roboto_black" />
+        android:font="@font/sourceserif_bold" />
     <font
         android:fontStyle="italic"
         android:fontWeight="700"
@@ -11,7 +11,7 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="600"
-        android:font="@font/roboto_bold" />
+        android:font="@font/sourceserif_semibold" />
     <font
         android:fontStyle="italic"
         android:fontWeight="600"
@@ -19,11 +19,11 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/roboto_regular" />
+        android:font="@font/sourceserif_regular" />
     <font
         android:fontStyle="italic"
         android:fontWeight="400"
-        android:font="@font/roboto_italic" />
+        android:font="@font/sourceserif_italic" />
     <font
         android:fontStyle="normal"
         android:fontWeight="300"

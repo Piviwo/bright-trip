@@ -153,8 +153,8 @@ public class ExploreFragment extends Fragment {
             String color = status.equals("open") ? "#FBD437" : "#F94124";
             String openText = status.equals("open") ? " from: " : " - open from: ";
                     html_array[i] = HtmlCompat.fromHtml(
-                    "<big><span style='color: #FFBF00;'>" + name + "</span></big><small><br><br></small>" +
-                            "<span>" + fclass + "</span><br>" +
+                    "<big><span style='color: #FFD800;'>" + name + "</span></big><small><br></small>" +
+                            "<small><span>" + fclass + "</span><br><br></small>" +
                             "<span>" + "address" + "</span><br><br>" +
                             "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
                             "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
