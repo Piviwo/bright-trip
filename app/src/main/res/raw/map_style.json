@@ -95,6 +95,9 @@
     "stylers": [
       {
         "color": "#334e87"
+      },
+      {
+        "visibility": "off"
       }
     ]
   },
