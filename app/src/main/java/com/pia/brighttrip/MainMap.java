@@ -58,8 +58,11 @@ import java.net.URL;
 import java.util.Arrays;
 import android.location.Location;
 
-
+/**
+ * The fragment contains the main map and all functionalities for it
+ */
 public class MainMap extends Fragment {
+    // Initialize global variables
     private static final LatLng BERLIN = new LatLng(52.5308, 13.3472);
     private static final float INITIAL_ZOOM_LEVEL = 15.0f;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -129,6 +132,7 @@ public class MainMap extends Fragment {
 
     /**
      * Handles the map being ready for interaction.
+     * Calls several functions that depend on map being ready
      * @param googleMap The GoogleMap instance.
      */
     private void onMapReady(GoogleMap googleMap) {
@@ -147,7 +151,7 @@ public class MainMap extends Fragment {
      */
     private void setUpFindPlaces(){
 
-        // Initialize the Places API and AutocompleteSupportFragment.
+        // Initialize the google places API and AutocompleteSupportFragment.
         Places.initialize(requireContext().getApplicationContext(), googleApiKey);
 
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
@@ -164,19 +168,21 @@ public class MainMap extends Fragment {
             EditText editText = fragmentView.findViewById(
                     com.google.android.libraries.places.R.id.places_autocomplete_search_input);
 
+            // Change the tint of the edit text
             if (editText != null) {
                 editText.setTextColor(getResources().getColor(R.color.white));
                 editText.setHintTextColor(getResources().getColor(R.color.white_grey));
             }
 
+            // Change the tint of the magnifier icon
             ImageView searchIcon = fragmentView.findViewById(
                     com.google.android.libraries.places.R.id.places_autocomplete_search_button);
-
             if (searchIcon != null) {
-                // Change the tint of the magnifier icon
                 searchIcon.setColorFilter(getResources().getColor(R.color.white_grey),
                         PorterDuff.Mode.SRC_IN);
             }
+
+            // Change the tint of the clear button
             ImageButton clearButton = fragmentView.findViewById(
                     com.google.android.libraries.places.R.id.places_autocomplete_clear_button);
             clearButton.setColorFilter(getResources().getColor(R.color.white_grey));
@@ -247,6 +253,7 @@ public class MainMap extends Fragment {
         }
         LatLng position = new LatLng(yCoord,xCoord);
 
+        // Add custom marker (depending on fclass) resource and add to map
         int markerResource = getMarkerResource(fclass);
         BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(markerResource);
 
@@ -258,7 +265,10 @@ public class MainMap extends Fragment {
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
     }
 
-    // Method to get the appropriate marker drawable resource based on fclass
+    /**
+     * Gets appropriate marker from resources depending on flcass
+     * @param fclass
+     */
     private int getMarkerResource(String fclass) {
         switch (fclass) {
             case "bar":
@@ -313,6 +323,7 @@ public class MainMap extends Fragment {
      * Sets up map UI settings
      */
     private void setupMapUI() {
+        // General UI settings of the map (Zoom, Toolbar, Current Location, Compass, Map Type, Initial position and zoom level)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(BERLIN, INITIAL_ZOOM_LEVEL));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
@@ -328,28 +339,31 @@ public class MainMap extends Fragment {
             //onRequestPermissionsResult();
         }
 
-        //Custom map buttons
+        // Custom map buttons (zoom and current location)
         ImageButton btnZoomIn = getView().findViewById(R.id.btn_zoom_in);
         ImageButton btnZoomOut = getView().findViewById(R.id.btn_zoom_out);
         ImageButton btnCurrentLocation = getView().findViewById(R.id.btn_current_location);
 
+        // New zoom in function
         btnZoomIn.setOnClickListener(v -> {
             if (googleMap != null) {
                 googleMap.animateCamera(CameraUpdateFactory.zoomIn());
             }
         });
 
+        // New zoom out function
         btnZoomOut.setOnClickListener(v -> {
             if (googleMap != null) {
                 googleMap.animateCamera(CameraUpdateFactory.zoomOut());
             }
         });
 
+        // New current location function
         btnCurrentLocation.setOnClickListener(v -> {
             // Get the last known location from FusedLocationProviderClient
             fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
                 if (location != null) {
-                    // Get the latitude and longitude from the Location object
+                    // Get the latitude and longitude from the location object
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng userLocation = new LatLng(latitude, longitude);
@@ -390,9 +404,11 @@ public class MainMap extends Fragment {
     private void setupMapClickListener() {
         googleMap.setOnMapClickListener(newPos -> {
             if (clickMarker != null){
-                //remove previous markers
+                // Remove previous markers
                 clickMarker.remove();
             }
+
+            // Add marker on clicked location
             BitmapDescriptor customMarker = BitmapDescriptorFactory.fromResource(R.drawable.yellow_marker);
             clickMarker = googleMap.addMarker(new MarkerOptions()
                     .zIndex(1.0f)
@@ -405,12 +421,15 @@ public class MainMap extends Fragment {
 
     /**
      * Draws a polyline between the current location and the specified position.
+     * @param destination
      */
     private void drawRouteTo(LatLng destination) {
+        // Retrieve current location
         fusedLocationClient.getLastLocation()
             .addOnSuccessListener(requireActivity(), location -> {
                 if (location != null && googleMap != null) {
-                    // Build the Directions API request URL
+
+                    // Build the directions API request URL
                     String url =
                         "https://api.openrouteservice.org/v2/directions/"
                                 + "driving-car"

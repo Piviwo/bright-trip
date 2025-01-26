@@ -22,12 +22,14 @@ import android.os.Looper;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+// This Activity contains the main activity which is called when starting the app
 public class MainActivity extends AppCompatActivity {
+
+    // Initialize global variables
     BottomNavigationView bottomNavigationView;
     LocationManager locationManager;
     LocationListener locationListener;
     private LocationViewModel locationViewModel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +105,10 @@ public class MainActivity extends AppCompatActivity {
         locationPermissionRequest.launch(PERMISSIONS);
     }
 
-    // Handles the navigation selection of the bottom navigation bar
+    /**
+     * Handles the navigation selection of the bottom navigation bar
+     * @param item
+     */
     private boolean handleNavigationSelection(@NonNull MenuItem item) {
         Fragment fragment = null;
 

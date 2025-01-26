@@ -11,20 +11,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+// This class contains functionalities to handle the database
 public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // Initializes global variables and paths to folders
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/user/0/";
     private static String DB_PATH_SUFFIX = "/databases/";
     private static String DB_NAME = "pois_moabit.sqlite";
     private SQLiteDatabase myDataBase;
     private final Context myContext;
+
+    /**
+     * Creates an instance of DatabaseHelper
+     * @param context
+     */
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
         this.myContext = context;
     }
+
+    /**
+     * Creates a new database
+     * @throws IOException
+     */
     public void createDataBase() throws IOException {
         DB_PATH = DB_PATH_PREFIX + myContext.getPackageName()
                 + DB_PATH_SUFFIX + DB_NAME;
+
+        // Check if DB exists
         boolean dbExist = checkDataBase();
         SQLiteDatabase db_Read = null;
         if (dbExist) {
@@ -37,6 +52,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
     }
+
+    /**
+     * Checks whether database already exists in device folder
+     */
     private boolean checkDataBase() {
         SQLiteDatabase checkDB = null;
         try {
@@ -48,6 +67,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
         }
     }
+
+    /**
+     * Copies database into device folder
+     * @throws IOException
+     */
     private void copyDataBase() throws IOException {
         InputStream assetsDB = myContext.getAssets().open(DB_NAME);
         File directory = new File(DB_PATH);
@@ -63,14 +87,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dbOut.flush();
         dbOut.close();
     }
+
+    /**
+     * Opens the database
+     * @throws SQLException
+     */
     public SQLiteDatabase getDataBase() throws SQLException {
         myDataBase = SQLiteDatabase.openDatabase(DB_PATH, null,
                 SQLiteDatabase.NO_LOCALIZED_COLLATORS);
         return myDataBase;
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
