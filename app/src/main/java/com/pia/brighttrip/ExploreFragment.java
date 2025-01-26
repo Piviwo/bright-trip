@@ -75,6 +75,13 @@ public class ExploreFragment extends Fragment {
         }
 
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Onclick function for transferring data from explore to map fragment
+             * @param parent
+             * @param view
+             * @param position
+             * @param id
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MainMap mainMapFragment = new MainMap();
