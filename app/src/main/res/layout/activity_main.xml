@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:background="@color/app_background"
     tools:context=".MainActivity">
+
+    <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/btm_nav"
         android:layout_width="match_parent"
@@ -17,9 +19,11 @@
         app:itemTextColor="@color/btm_nav_colors"
         style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
         app:menu="@menu/btm_nav_items"/>
+
     <RelativeLayout
         android:id="@+id/rel_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/btm_nav" />
+
 </RelativeLayout>

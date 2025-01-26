@@ -29,8 +29,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+// This fragment contains the explore section of the app
 public class ExploreFragment extends Fragment {
 
+    // Initialize global variables
     private ListView list_view;
     private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -106,17 +108,23 @@ public class ExploreFragment extends Fragment {
 
     }
 
+    /**
+     * Function to retrieve data from the cursor and add them to HTML array
+     * @param cursor
+     */
     private ArrayAdapter<CharSequence> createAdapterHtml(Cursor cursor) {
         if (cursor == null || cursor.getCount() == 0) {
             return new ArrayAdapter<>(requireContext(),
                     R.layout.list_item, new Spanned[]{});
         }
 
+        // Initialize variables
         int length = cursor.getCount();
         cursor.moveToFirst();
         Spanned[] html_array = new Spanned[length];
         Geocoder geocoder = new Geocoder(requireContext());
 
+        // Get cursor indices
         int index_fclass = cursor.getColumnIndex("fclass");
         int index_name = cursor.getColumnIndex("name");
         int index_xcoord = cursor.getColumnIndex("xcoord");
@@ -125,6 +133,7 @@ public class ExploreFragment extends Fragment {
         int index_closes = cursor.getColumnIndex("closes");
 
 
+        // Iterate through cursor with indices and store values in variables
         for (int i = 0; i < length; i++) {
             String name = cursor.getString(index_name).toUpperCase();
             String fclass = cursor.getString(index_fclass).toLowerCase().replace("_", " ");
@@ -136,7 +145,7 @@ public class ExploreFragment extends Fragment {
 
             // Use the Geocoder to fetch the address for the coordinates
             String address = "";
-            if (i < 10) { // Geocode only the first 10 items
+            if (i < 10) { // Geocode only the first 10 items (to save time and credits)
                 try {
                     List<Address> addresses = geocoder.getFromLocation(ycoord, xcoord, 1);
                     if (addresses != null && !addresses.isEmpty()) {
@@ -188,15 +197,18 @@ public class ExploreFragment extends Fragment {
                 Log.e("AMENITY_STATUS", "Error parsing time", e);
             }
 
+            // Adjust color of opening times depending on open or close status
             String color = status.equals("open") ? "#FBD437" : "#F94124";
             String openText = status.equals("open") ? " - from: " : " - open from: ";
-                    html_array[i] = HtmlCompat.fromHtml(
-                    "<big><span style='color: #FFD800;'>" + name + "</span></big><small><br></small>" +
-                            "<span>" + address + "</span><br><br>" +
-                            //"<small><span>" + fclass + "</span><br><br></small>" +
-                            "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
-                            "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
+
+            // Put all the data into HTML array
+            html_array[i] = HtmlCompat.fromHtml(
+            "<big><span style='color: #FFD800;'>" + name + "</span></big><small><br></small>" +
+                    "<span>" + address + "</span><br><br>" +
+                    //"<small><span>" + fclass + "</span><br><br></small>" +
+                    "<b><span style='color:" + color + ";'>" + status + "</span></b>" +
+                    "<span>" + openText + opens.substring(0, 5) + " to " + closes.substring(0, 5) + "</span>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
             );
             cursor.moveToNext();
         }
@@ -204,6 +216,9 @@ public class ExploreFragment extends Fragment {
         return new ArrayAdapter<>(requireContext(), R.layout.list_item, html_array);
     }
 
+    /**
+     * Closes Cursor
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
